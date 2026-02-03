@@ -355,7 +355,7 @@
                 </div>
               </div>
 
-               <div className="grid grid-cols-2 gap-3">
+               <div className="grid grid-cols-2 gap-3 overflow-hidden">
                 <div>
                   <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roast Level</label>
                   <div className="flex bg-gray-800 p-0.5 rounded-lg border border-gray-700">
@@ -382,8 +382,8 @@
                     type="date" 
                     value={roastDate}
                     onChange={(e) => setRoastDate(e.target.value)}
-                    className="w-full border border-gray-700 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
-                    style={{fontSize: '0.875rem', colorScheme: 'dark'}}
+                    className="w-full max-w-full box-border border border-gray-700 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
+                    style={{fontSize: '0.8rem', colorScheme: 'dark'}}
                   />
                 </div>
               </div>
