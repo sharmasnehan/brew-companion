@@ -106,6 +106,8 @@
     const Loader = (props) => <Icon name="Loader" {...props} />;
     const Plus = (props) => <Icon name="Plus" {...props} />;
     const X = (props) => <Icon name="X" {...props} />;
+    const Trash = (props) => <Icon name="Trash2" {...props} />;
+    const Edit = (props) => <Icon name="Pencil" {...props} />;
 
     const COUNTRIES = [
       'Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 
@@ -258,6 +260,9 @@
           setLogs(data.map(log => ({
             id: log.id,
             date: new Date(log.created_at).toLocaleDateString(),
+            brewDate: log.brew_date,
+            roastDate: log.roast_date,
+            roaster: log.roaster,
             origin: log.origin,
             varietal: log.varietal,
             method: log.method,
@@ -271,6 +276,16 @@
         setLogsLoading(false);
       };
 
+      const deleteLog = async (id) => {
+        if (!confirm('Delete this entry?')) return;
+        const { error } = await supabase.from('brew_logs').delete().eq('id', id);
+        if (error) {
+          alert('Failed to delete: ' + error.message);
+        } else {
+          await loadLogs();
+        }
+      };
+
       const saveLog = async (rating, notes) => {
         const { error } = await supabase.from('brew_logs').insert({
           user_id: user.id,
@@ -278,10 +293,13 @@
           varietal,
           method,
           roast,
+          roaster: roasterName || null,
           coffee_amount: coffeeAmount,
           ratio,
           rating,
-          notes
+          notes,
+          brew_date: new Date().toISOString().split('T')[0],
+          roast_date: roastDate || null
         });
 
         if (error) {
@@ -852,20 +870,23 @@
       };
 
       const [showManualEntry, setShowManualEntry] = useState(false);
+      const [editingLog, setEditingLog] = useState(null);
 
-      const ManualEntryModal = () => {
-        const [brewType, setBrewType] = useState('pourover');
-        const [entryMethod, setEntryMethod] = useState('v60');
-        const [entryOrigin, setEntryOrigin] = useState('Ethiopia');
-        const [entryVarietal, setEntryVarietal] = useState('Heirloom');
-        const [entryRoast, setEntryRoast] = useState('medium');
-        const [entryRoaster, setEntryRoaster] = useState('');
-        const [entryCoffee, setEntryCoffee] = useState(18);
-        const [entryRatio, setEntryRatio] = useState(16);
-        const [entryYield, setEntryYield] = useState(36);
+      const ManualEntryModal = ({ editingLog = null }) => {
+        const [brewType, setBrewType] = useState(editingLog?.method === 'espresso' ? 'espresso' : 'pourover');
+        const [entryMethod, setEntryMethod] = useState(editingLog?.method || 'v60');
+        const [entryOrigin, setEntryOrigin] = useState(editingLog?.origin || 'Ethiopia');
+        const [entryVarietal, setEntryVarietal] = useState(editingLog?.varietal || 'Heirloom');
+        const [entryRoast, setEntryRoast] = useState(editingLog?.roast || 'medium');
+        const [entryRoaster, setEntryRoaster] = useState(editingLog?.roaster || '');
+        const [entryCoffee, setEntryCoffee] = useState(editingLog?.coffeeAmount || 18);
+        const [entryRatio, setEntryRatio] = useState(editingLog?.ratio || 16);
+        const [entryYield, setEntryYield] = useState(editingLog?.ratio || 36);
         const [entryTime, setEntryTime] = useState(28);
-        const [entryRating, setEntryRating] = useState(0);
-        const [entryNotes, setEntryNotes] = useState('');
+        const [entryRating, setEntryRating] = useState(editingLog?.rating || 0);
+        const [entryNotes, setEntryNotes] = useState(editingLog?.notes || '');
+        const [entryBrewDate, setEntryBrewDate] = useState(editingLog?.brewDate || new Date().toISOString().split('T')[0]);
+        const [entryRoastDate, setEntryRoastDate] = useState(editingLog?.roastDate || '');
         const [saving, setSaving] = useState(false);
 
         const handleSave = async () => {
@@ -876,16 +897,25 @@
             varietal: entryVarietal,
             method: brewType === 'espresso' ? 'espresso' : entryMethod,
             roast: entryRoast,
+            roaster: entryRoaster || null,
             coffee_amount: entryCoffee || 0,
             ratio: brewType === 'espresso' ? (entryYield || 0) : (entryRatio || 0),
             rating: entryRating || null,
             notes: brewType === 'espresso' 
-              ? `${entryTime}s | ${entryRoaster ? entryRoaster + ' | ' : ''}${entryNotes}`.trim()
-              : `${entryRoaster ? entryRoaster + ' | ' : ''}${entryNotes}`.trim() || null
+              ? `${entryTime}s | ${entryNotes}`.trim()
+              : entryNotes || null,
+            brew_date: entryBrewDate || null,
+            roast_date: entryRoastDate || null
           };
           
           console.log('Saving log:', logData);
-          const { data, error } = await supabase.from('brew_logs').insert(logData).select();
+          let result;
+          if (editingLog) {
+            result = await supabase.from('brew_logs').update(logData).eq('id', editingLog.id).select();
+          } else {
+            result = await supabase.from('brew_logs').insert(logData).select();
+          }
+          const { data, error } = result;
           console.log('Response:', { data, error });
           if (error) {
             console.error('Error saving:', error);
@@ -894,6 +924,7 @@
             console.log('Saved successfully:', data);
             await loadLogs();
             setShowManualEntry(false);
+            setEditingLog(null);
           }
           setSaving(false);
         };
@@ -901,8 +932,8 @@
         return (
           <div className="space-y-4">
             <div className="flex items-center justify-between mb-2">
-              <h2 className="font-semibold text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.25rem'}}>Add Entry</h2>
-              <button onClick={() => setShowManualEntry(false)} className="text-gray-500 hover:text-white p-1">
+              <h2 className="font-semibold text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.25rem'}}>{editingLog ? 'Edit Entry' : 'Add Entry'}</h2>
+              <button onClick={() => { setShowManualEntry(false); setEditingLog(null); }} className="text-gray-500 hover:text-white p-1">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -972,6 +1003,19 @@
                   </div>
                 </div>
 
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Brew Date</label>
+                    <input type="date" value={entryBrewDate} onChange={(e) => setEntryBrewDate(e.target.value)}
+                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem', colorScheme: 'dark'}} />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roast Date</label>
+                    <input type="date" value={entryRoastDate} onChange={(e) => setEntryRoastDate(e.target.value)}
+                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem', colorScheme: 'dark'}} />
+                  </div>
+                </div>
+
                 {brewType === 'espresso' ? (
                   <div className="grid grid-cols-3 gap-3">
                     <div>
@@ -1033,8 +1077,8 @@
       };
 
       const HistoryView = () => {
-        if (showManualEntry && user) {
-          return <ManualEntryModal />;
+        if ((showManualEntry || editingLog) && user) {
+          return <ManualEntryModal editingLog={editingLog} />;
         }
 
         return (
@@ -1110,10 +1154,27 @@
                    </div>
 
                    {log.notes && (
-                     <p className="text-gray-400 italic border-l-2 border-purple-500/50 pl-3 py-1" style={{fontSize: '1rem'}}>
+                     <p className="text-gray-400 italic border-l-2 border-purple-500/50 pl-3 py-1" style={{fontSize: '0.85rem'}}>
                        "{log.notes}"
                      </p>
                    )}
+                   
+                   <div className="flex justify-end gap-2 mt-3 pt-3 border-t border-gray-800">
+                     <button 
+                       onClick={() => setEditingLog(log)}
+                       className="flex items-center gap-1 text-gray-500 hover:text-purple-400 transition-colors px-2 py-1"
+                     >
+                       <Edit className="w-4 h-4" />
+                       <span style={{fontSize: '0.75rem'}}>Edit</span>
+                     </button>
+                     <button 
+                       onClick={() => deleteLog(log.id)}
+                       className="flex items-center gap-1 text-gray-500 hover:text-red-400 transition-colors px-2 py-1"
+                     >
+                       <Trash className="w-4 h-4" />
+                       <span style={{fontSize: '0.75rem'}}>Delete</span>
+                     </button>
+                   </div>
                 </Card>
               ))
             )}
