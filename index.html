@@ -97,7 +97,8 @@
 
     const COUNTRIES = [
       'Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 
-      'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 'Other'
+      'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 
+      'Nepal', 'India', 'Other'
     ];
 
     const VARIETALS = [
@@ -182,7 +183,7 @@
       const [view, setView] = useState('config');
       const [logs, setLogs] = useState([]);
 
-      const waterAmount = Math.round(coffeeAmount * ratio);
+      const waterAmount = Math.round((coffeeAmount || 0) * (ratio || 0));
       const currentMethod = METHODS[method];
 
       const getDynamicGrind = () => {
@@ -404,7 +405,7 @@
                     min="1" 
                     max="100" 
                     value={coffeeAmount} 
-                    onChange={(e) => setCoffeeAmount(Number(e.target.value) || 1)}
+                    onChange={(e) => setCoffeeAmount(e.target.value === '' ? '' : Number(e.target.value))}
                     className="w-full border border-gray-700 rounded-lg py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-bold text-green-400 text-center appearance-none"
                     style={{fontSize: '1rem'}}
                   />
@@ -418,7 +419,7 @@
                     max="30" 
                     step="0.5"
                     value={ratio} 
-                    onChange={(e) => setRatio(Number(e.target.value) || 1)}
+                    onChange={(e) => setRatio(e.target.value === '' ? '' : Number(e.target.value))}
                     className="w-full border border-gray-700 rounded-lg py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-bold text-green-400 text-center appearance-none"
                     style={{fontSize: '1rem'}}
                   />
