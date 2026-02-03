@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Brew Companion</title>
+  <title>Brew Buddy</title>
   <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -11,7 +11,7 @@
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400&family=Nunito:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400&family=Nunito:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
   <style>
     :root {
       --font-display: 'Fraunces', serif;
@@ -287,14 +287,13 @@
 
       const steps = generateSteps();
 
-      const ConfigView = () => (
+      const configView = (
         <div className="space-y-4 pb-6">
-          <div className="text-center space-y-1 mb-5">
-            <h1 className="font-semibold text-white flex items-center justify-center gap-2" style={{fontFamily: "'Fraunces', serif", fontSize: '1.5rem'}}>
-              <Coffee className="w-6 h-6 text-purple-400" />
-              Brew Companion
+          <div className="flex flex-col items-center justify-center mb-6">
+            <Coffee className="w-14 h-14 text-purple-400 mb-2" />
+            <h1 className="text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '2.25rem'}}>
+              Brew Buddy
             </h1>
-            <p className="text-gray-500" style={{fontSize: '0.875rem'}}>Optimized for your phone & palate.</p>
           </div>
 
           <Card>
@@ -753,7 +752,7 @@
           </nav>
 
           <main className="px-4 py-5 min-h-screen pb-24 md:pb-8 max-w-md mx-auto">
-            {view === 'config' && <ConfigView />}
+            {view === 'config' && configView}
             {view === 'brew' && <BrewSessionView />}
             {view === 'history' && <HistoryView />}
           </main>
