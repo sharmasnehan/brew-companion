@@ -104,6 +104,8 @@
     const LogOut = (props) => <Icon name="LogOut" {...props} />;
     const User = (props) => <Icon name="User" {...props} />;
     const Loader = (props) => <Icon name="Loader" {...props} />;
+    const Plus = (props) => <Icon name="Plus" {...props} />;
+    const X = (props) => <Icon name="X" {...props} />;
 
     const COUNTRIES = [
       'Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 
@@ -158,6 +160,13 @@
         description: 'Fast, pressurized brew. Rich and concentrated.',
         baseGrind: 'Fine',
         totalTime: 120
+      },
+      espresso: {
+        name: 'Espresso',
+        defaultRatio: 2,
+        description: 'Pressurized extraction. Intense and concentrated.',
+        baseGrind: 'Fine',
+        totalTime: 30
       }
     };
 
@@ -842,10 +851,201 @@
         );
       };
 
-      const HistoryView = () => (
+      const [showManualEntry, setShowManualEntry] = useState(false);
+
+      const ManualEntryModal = () => {
+        const [brewType, setBrewType] = useState('pourover');
+        const [entryMethod, setEntryMethod] = useState('v60');
+        const [entryOrigin, setEntryOrigin] = useState('Ethiopia');
+        const [entryVarietal, setEntryVarietal] = useState('Heirloom');
+        const [entryRoast, setEntryRoast] = useState('medium');
+        const [entryRoaster, setEntryRoaster] = useState('');
+        const [entryCoffee, setEntryCoffee] = useState(18);
+        const [entryRatio, setEntryRatio] = useState(16);
+        const [entryYield, setEntryYield] = useState(36);
+        const [entryTime, setEntryTime] = useState(28);
+        const [entryRating, setEntryRating] = useState(0);
+        const [entryNotes, setEntryNotes] = useState('');
+        const [saving, setSaving] = useState(false);
+
+        const handleSave = async () => {
+          setSaving(true);
+          const logData = {
+            user_id: user.id,
+            origin: entryOrigin,
+            varietal: entryVarietal,
+            method: brewType === 'espresso' ? 'espresso' : entryMethod,
+            roast: entryRoast,
+            coffee_amount: entryCoffee,
+            ratio: brewType === 'espresso' ? entryYield : entryRatio,
+            rating: entryRating,
+            notes: brewType === 'espresso' 
+              ? `${entryTime}s | ${entryRoaster ? entryRoaster + ' | ' : ''}${entryNotes}`.trim()
+              : `${entryRoaster ? entryRoaster + ' | ' : ''}${entryNotes}`.trim()
+          };
+          
+          const { error } = await supabase.from('brew_logs').insert(logData);
+          if (error) {
+            console.error('Error saving:', error);
+            alert('Failed to save. Please try again.');
+          } else {
+            await loadLogs();
+            setShowManualEntry(false);
+          }
+          setSaving(false);
+        };
+
+        return (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h2 className="font-semibold text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.25rem'}}>Add Entry</h2>
+              <button onClick={() => setShowManualEntry(false)} className="text-gray-500 hover:text-white p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex bg-gray-800 p-0.5 rounded-lg border border-gray-700 mb-4">
+              <button
+                onClick={() => setBrewType('pourover')}
+                className={`flex-1 py-2 font-semibold rounded-md transition-all ${brewType === 'pourover' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'}`}
+                style={{fontSize: '0.8rem'}}
+              >
+                Pour Over
+              </button>
+              <button
+                onClick={() => setBrewType('espresso')}
+                className={`flex-1 py-2 font-semibold rounded-md transition-all ${brewType === 'espresso' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'}`}
+                style={{fontSize: '0.8rem'}}
+              >
+                Espresso
+              </button>
+            </div>
+
+            <Card>
+              <div className="space-y-3">
+                {brewType === 'pourover' && (
+                  <div>
+                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Method</label>
+                    <select value={entryMethod} onChange={(e) => setEntryMethod(e.target.value)}
+                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
+                      {Object.entries(METHODS).filter(([k]) => k !== 'espresso').map(([key, m]) => (
+                        <option key={key} value={key}>{m.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Origin</label>
+                    <select value={entryOrigin} onChange={(e) => setEntryOrigin(e.target.value)}
+                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
+                      {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Varietal</label>
+                    <select value={entryVarietal} onChange={(e) => setEntryVarietal(e.target.value)}
+                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
+                      {VARIETALS.map(v => <option key={v} value={v}>{v}</option>)}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roast</label>
+                    <select value={entryRoast} onChange={(e) => setEntryRoast(e.target.value)}
+                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
+                      <option value="light">Light</option>
+                      <option value="medium">Medium</option>
+                      <option value="dark">Dark</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roaster</label>
+                    <input type="text" value={entryRoaster} onChange={(e) => setEntryRoaster(e.target.value)}
+                      placeholder="Optional" className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}} />
+                  </div>
+                </div>
+
+                {brewType === 'espresso' ? (
+                  <div className="grid grid-cols-3 gap-3">
+                    <div>
+                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Dose (g)</label>
+                      <input type="number" value={entryCoffee} onChange={(e) => setEntryCoffee(Number(e.target.value))}
+                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Yield (g)</label>
+                      <input type="number" value={entryYield} onChange={(e) => setEntryYield(Number(e.target.value))}
+                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Time (s)</label>
+                      <input type="number" value={entryTime} onChange={(e) => setEntryTime(Number(e.target.value))}
+                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
+                    </div>
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Coffee (g)</label>
+                      <input type="number" value={entryCoffee} onChange={(e) => setEntryCoffee(Number(e.target.value))}
+                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
+                    </div>
+                    <div>
+                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Ratio (1:X)</label>
+                      <input type="number" value={entryRatio} onChange={(e) => setEntryRatio(Number(e.target.value))}
+                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
+                    </div>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Rating</label>
+                  <div className="flex justify-center gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button key={star} onClick={() => setEntryRating(star)} className="focus:outline-none transition-transform hover:scale-110 active:scale-95">
+                        <Star className={`w-8 h-8 ${star <= entryRating ? 'text-purple-400' : 'text-gray-700'}`} fill={star <= entryRating ? 'currentColor' : 'none'} />
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Notes</label>
+                  <textarea value={entryNotes} onChange={(e) => setEntryNotes(e.target.value)}
+                    placeholder="Tasting notes, adjustments..."
+                    className="w-full border border-gray-700 rounded-lg p-3 h-20 bg-gray-800 font-medium text-gray-200 resize-none" style={{fontSize: '0.875rem'}} />
+                </div>
+
+                <Button onClick={handleSave} disabled={saving} className="w-full py-2.5 mt-2">
+                  {saving ? 'Saving...' : 'Save Entry'}
+                </Button>
+              </div>
+            </Card>
+          </div>
+        );
+      };
+
+      const HistoryView = () => {
+        if (showManualEntry && user) {
+          return <ManualEntryModal />;
+        }
+
+        return (
         <div className="h-[calc(100vh-5rem)] flex flex-col">
-          <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center justify-center mb-4 relative">
             <h2 className="font-semibold text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.25rem'}}>Brew Buddy Journal</h2>
+            {user && (
+              <button 
+                onClick={() => setShowManualEntry(true)}
+                className="absolute right-0 w-9 h-9 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center hover:bg-green-500/30 transition-colors"
+              >
+                <Plus className="w-5 h-5 text-green-400" />
+              </button>
+            )}
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3 pb-20">
@@ -917,6 +1117,7 @@
           </div>
         </div>
       );
+      };
 
       return (
         <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500/30">
