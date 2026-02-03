@@ -131,6 +131,20 @@
         baseGrind: 'Medium',
         totalTime: 240
       },
+      chemex: {
+        name: 'Chemex',
+        defaultRatio: 15,
+        description: 'Iconic design. Clean, bright cup with thick filter.',
+        baseGrind: 'Medium-Coarse',
+        totalTime: 240
+      },
+      kalita: {
+        name: 'Kalita Wave',
+        defaultRatio: 16,
+        description: 'Flat-bottom dripper. Consistent and forgiving.',
+        baseGrind: 'Medium',
+        totalTime: 180
+      },
       origami: {
         name: 'Origami',
         defaultRatio: 16,
@@ -190,6 +204,7 @@
       const [ratio, setRatio] = useState(16); 
       const [waterTemp, setWaterTemp] = useState(94);
       const [roastDate, setRoastDate] = useState('');
+      const [roasterName, setRoasterName] = useState('');
       const [view, setView] = useState('config');
       const [logs, setLogs] = useState([]);
       
@@ -363,10 +378,18 @@
         switch (method) {
           case 'v60':
           case 'origami':
+          case 'kalita':
             return [
               { name: 'Bloom', description: 'Pour just enough water to wet grounds. Swirl gently.', duration: 45, waterTarget: Math.round(bloomWater) },
               { name: 'Main Pour', description: 'Pour remaining water in slow spirals.', duration: 45, waterTarget: waterAmount },
               { name: 'Drawdown', description: 'Gently swirl and tap. Wait for total drain.', duration: currentMethod.totalTime - 90, waterTarget: waterAmount }
+            ];
+          case 'chemex':
+            return [
+              { name: 'Bloom', description: 'Pour just enough water to wet grounds. Wait.', duration: 45, waterTarget: Math.round(bloomWater) },
+              { name: 'First Pour', description: 'Pour slowly in circles to halfway.', duration: 60, waterTarget: Math.round(waterAmount * 0.6) },
+              { name: 'Second Pour', description: 'Continue pouring to target weight.', duration: 60, waterTarget: waterAmount },
+              { name: 'Drawdown', description: 'Let it drain completely.', duration: 75, waterTarget: waterAmount }
             ];
           case 'v60_switch':
             return [
@@ -431,26 +454,33 @@
             </h2>
             
             <div className="space-y-4">
-              <div>
-                <label className="block font-semibold text-gray-400 mb-2 uppercase tracking-wide" style={{fontSize: '0.75rem'}}>Brew Method</label>
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                  {Object.entries(METHODS).map(([key, m]) => (
-                    <button
-                      key={key}
-                      onClick={() => {
-                        setMethod(key);
-                        setRatio(m.defaultRatio);
-                      }}
-                      className={`flex flex-col items-center justify-center p-2 rounded-lg border font-semibold transition-all h-16 ${
-                        method === key 
-                          ? 'border-purple-500 bg-purple-500/10 text-purple-300 ring-1 ring-purple-500/50' 
-                          : 'border-gray-700 text-gray-400 hover:bg-gray-800 hover:border-gray-600'
-                      }`}
-                      style={{fontSize: '0.7rem'}}
-                    >
-                      <span className="text-center leading-tight">{m.name}</span>
-                    </button>
-                  ))}
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Brew Method</label>
+                  <select
+                    value={method}
+                    onChange={(e) => {
+                      setMethod(e.target.value);
+                      setRatio(METHODS[e.target.value].defaultRatio);
+                    }}
+                    className="w-full border border-gray-700 rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
+                    style={{fontSize: '0.875rem'}}
+                  >
+                    {Object.entries(METHODS).map(([key, m]) => (
+                      <option key={key} value={key}>{m.name}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roaster / Name</label>
+                  <input 
+                    type="text" 
+                    value={roasterName}
+                    onChange={(e) => setRoasterName(e.target.value)}
+                    placeholder="e.g. Blue Bottle"
+                    className="w-full border border-gray-700 rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
+                    style={{fontSize: '0.875rem'}}
+                  />
                 </div>
               </div>
 
