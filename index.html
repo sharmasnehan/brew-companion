@@ -876,18 +876,19 @@
             varietal: entryVarietal,
             method: brewType === 'espresso' ? 'espresso' : entryMethod,
             roast: entryRoast,
-            coffee_amount: entryCoffee,
-            ratio: brewType === 'espresso' ? entryYield : entryRatio,
-            rating: entryRating,
+            coffee_amount: entryCoffee || 0,
+            ratio: brewType === 'espresso' ? (entryYield || 0) : (entryRatio || 0),
+            rating: entryRating || null,
             notes: brewType === 'espresso' 
               ? `${entryTime}s | ${entryRoaster ? entryRoaster + ' | ' : ''}${entryNotes}`.trim()
-              : `${entryRoaster ? entryRoaster + ' | ' : ''}${entryNotes}`.trim()
+              : `${entryRoaster ? entryRoaster + ' | ' : ''}${entryNotes}`.trim() || null
           };
           
+          console.log('Saving log:', logData);
           const { error } = await supabase.from('brew_logs').insert(logData);
           if (error) {
             console.error('Error saving:', error);
-            alert('Failed to save. Please try again.');
+            alert('Failed to save: ' + error.message);
           } else {
             await loadLogs();
             setShowManualEntry(false);
