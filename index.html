@@ -885,11 +885,13 @@
           };
           
           console.log('Saving log:', logData);
-          const { error } = await supabase.from('brew_logs').insert(logData);
+          const { data, error } = await supabase.from('brew_logs').insert(logData).select();
+          console.log('Response:', { data, error });
           if (error) {
             console.error('Error saving:', error);
-            alert('Failed to save: ' + error.message);
+            alert('Failed to save: ' + (error.message || error.code || JSON.stringify(error)));
           } else {
+            console.log('Saved successfully:', data);
             await loadLogs();
             setShowManualEntry(false);
           }
