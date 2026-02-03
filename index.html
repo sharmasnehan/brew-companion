@@ -814,17 +814,13 @@
 
       const HistoryView = () => (
         <div className="h-[calc(100vh-5rem)] flex flex-col">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-white" style={{fontFamily: "'Fraunces', serif", fontSize: '1.25rem'}}>Journal</h2>
-            <Button variant="secondary" onClick={() => setView('config')} className="!px-3 !py-1.5 font-bold uppercase" style={{fontSize: '0.7rem'}}>
-               New Brew
-            </Button>
+          <div className="flex items-center justify-center mb-4">
+            <h2 className="font-semibold text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.25rem'}}>Brew Buddy Journal</h2>
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3 pb-20">
             {!user ? (
               <div className="text-center text-gray-500 py-20 flex flex-col items-center">
-                <LogIn className="w-16 h-16 mb-4 opacity-20" />
                 <p className="font-medium mb-2" style={{fontSize: '1rem'}}>Sign in to save your brews</p>
                 <p className="text-gray-600 mb-4" style={{fontSize: '0.875rem'}}>Your journal syncs across all devices</p>
                 <Button onClick={signInWithGoogle} className="mt-2">
