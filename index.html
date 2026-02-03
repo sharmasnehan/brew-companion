@@ -9,6 +9,7 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400&family=Nunito:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -60,6 +61,11 @@
   <script type="text/babel">
     const { useState, useEffect, useRef } = React;
 
+    // Supabase client
+    const SUPABASE_URL = 'https://yiimyoabdgsubradtejd.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpaW15b2FiZGdzdWJyYWR0ZWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODA5NzQsImV4cCI6MjA4NTY1Njk3NH0.pUWRRIae1GU5u36QcX2JeVR5Qa3JpbSaSUFtHTe2cDU';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
     // Icon components using Lucide
     const Icon = ({ name, className = "w-6 h-6", ...props }) => {
       const ref = useRef(null);
@@ -94,6 +100,10 @@
     const Scale = (props) => <Icon name="Scale" {...props} />;
     const Save = (props) => <Icon name="Save" {...props} />;
     const Star = (props) => <Icon name="Star" {...props} />;
+    const LogIn = (props) => <Icon name="LogIn" {...props} />;
+    const LogOut = (props) => <Icon name="LogOut" {...props} />;
+    const User = (props) => <Icon name="User" {...props} />;
+    const Loader = (props) => <Icon name="Loader" {...props} />;
 
     const COUNTRIES = [
       'Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 
@@ -182,6 +192,96 @@
       const [roastDate, setRoastDate] = useState('');
       const [view, setView] = useState('config');
       const [logs, setLogs] = useState([]);
+      
+      // Auth state
+      const [user, setUser] = useState(null);
+      const [authLoading, setAuthLoading] = useState(true);
+      const [logsLoading, setLogsLoading] = useState(false);
+
+      // Auth listener
+      useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+          setUser(session?.user ?? null);
+          setAuthLoading(false);
+        });
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          setUser(session?.user ?? null);
+        });
+
+        return () => subscription.unsubscribe();
+      }, []);
+
+      // Load logs when user changes
+      useEffect(() => {
+        if (user) {
+          loadLogs();
+        } else {
+          setLogs([]);
+        }
+      }, [user]);
+
+      const loadLogs = async () => {
+        setLogsLoading(true);
+        const { data, error } = await supabase
+          .from('brew_logs')
+          .select('*')
+          .order('created_at', { ascending: false });
+        
+        if (error) {
+          console.error('Error loading logs:', error);
+        } else {
+          setLogs(data.map(log => ({
+            id: log.id,
+            date: new Date(log.created_at).toLocaleDateString(),
+            origin: log.origin,
+            varietal: log.varietal,
+            method: log.method,
+            roast: log.roast,
+            rating: log.rating,
+            notes: log.notes,
+            coffeeAmount: log.coffee_amount,
+            ratio: log.ratio
+          })));
+        }
+        setLogsLoading(false);
+      };
+
+      const saveLog = async (rating, notes) => {
+        const { error } = await supabase.from('brew_logs').insert({
+          user_id: user.id,
+          origin,
+          varietal,
+          method,
+          roast,
+          coffee_amount: coffeeAmount,
+          ratio,
+          rating,
+          notes
+        });
+
+        if (error) {
+          console.error('Error saving log:', error);
+          alert('Failed to save log. Please try again.');
+        } else {
+          await loadLogs();
+        }
+      };
+
+      const signInWithGoogle = async () => {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+          options: {
+            redirectTo: window.location.origin + window.location.pathname
+          }
+        });
+        if (error) console.error('Error signing in:', error);
+      };
+
+      const signOut = async () => {
+        const { error } = await supabase.auth.signOut();
+        if (error) console.error('Error signing out:', error);
+      };
 
       const waterAmount = Math.round((coffeeAmount || 0) * (ratio || 0));
       const currentMethod = METHODS[method];
@@ -289,11 +389,39 @@
 
       const configView = (
         <div className="space-y-4 pb-6">
-          <div className="flex items-center justify-center gap-3 mb-6">
-            <Coffee className="w-12 h-12 text-purple-400" />
-            <h1 className="text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '2.25rem'}}>
-              Brew Buddy
-            </h1>
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-10" />
+            <div className="flex items-center gap-3">
+              <Coffee className="w-10 h-10 text-purple-400" />
+              <h1 className="text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.75rem'}}>
+                Brew Buddy
+              </h1>
+            </div>
+            {authLoading ? (
+              <div className="w-10 h-10 flex items-center justify-center">
+                <Loader className="w-5 h-5 text-gray-500 animate-spin" />
+              </div>
+            ) : user ? (
+              <button 
+                onClick={signOut}
+                className="w-10 h-10 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center hover:bg-purple-500/30 transition-colors"
+                title={`Signed in as ${user.email}`}
+              >
+                {user.user_metadata?.avatar_url ? (
+                  <img src={user.user_metadata.avatar_url} alt="" className="w-8 h-8 rounded-full" />
+                ) : (
+                  <User className="w-5 h-5 text-purple-400" />
+                )}
+              </button>
+            ) : (
+              <button 
+                onClick={signInWithGoogle}
+                className="w-10 h-10 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center hover:bg-green-500/30 transition-colors"
+                title="Sign in with Google"
+              >
+                <LogIn className="w-5 h-5 text-green-400" />
+              </button>
+            )}
           </div>
 
           <Card>
@@ -505,20 +633,10 @@
           return `${mins}:${secs.toString().padStart(2, '0')}`;
         };
 
-        const handleSaveLog = (rating, notes) => {
-          const newLog = {
-            id: Date.now().toString(),
-            date: new Date().toLocaleDateString(),
-            origin,
-            varietal,
-            method,
-            roast,
-            rating,
-            notes,
-            coffeeAmount,
-            ratio
-          };
-          setLogs([newLog, ...logs]);
+        const handleSaveLog = async (rating, notes) => {
+          if (user) {
+            await saveLog(rating, notes);
+          }
           setView('history');
         };
 
@@ -635,6 +753,28 @@
         const [rating, setRating] = useState(0);
         const [notes, setNotes] = useState('');
 
+        if (!user) {
+          return (
+            <div className="space-y-4 pt-6">
+              <h2 className="font-semibold text-center text-white" style={{fontFamily: "'Fraunces', serif", fontSize: '1.25rem'}}>Save Your Brew</h2>
+              <Card>
+                <div className="text-center py-6">
+                  <LogIn className="w-12 h-12 text-gray-600 mx-auto mb-4" />
+                  <p className="text-gray-400 mb-4" style={{fontSize: '0.9rem'}}>Sign in to save this brew to your journal</p>
+                  <Button onClick={signInWithGoogle} className="mb-3">
+                    <LogIn className="w-4 h-4" /> Sign in with Google
+                  </Button>
+                  <div className="mt-4">
+                    <Button variant="ghost" onClick={onCancel} className="text-gray-500">
+                      Skip for now
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            </div>
+          );
+        }
+
         return (
           <div className="space-y-4 pt-6">
             <h2 className="font-semibold text-center text-white" style={{fontFamily: "'Fraunces', serif", fontSize: '1.25rem'}}>Rate the Cup</h2>
@@ -682,7 +822,21 @@
           </div>
 
           <div className="flex-1 overflow-y-auto space-y-3 pb-20">
-            {logs.length === 0 ? (
+            {!user ? (
+              <div className="text-center text-gray-500 py-20 flex flex-col items-center">
+                <LogIn className="w-16 h-16 mb-4 opacity-20" />
+                <p className="font-medium mb-2" style={{fontSize: '1rem'}}>Sign in to save your brews</p>
+                <p className="text-gray-600 mb-4" style={{fontSize: '0.875rem'}}>Your journal syncs across all devices</p>
+                <Button onClick={signInWithGoogle} className="mt-2">
+                  <LogIn className="w-4 h-4" /> Sign in with Google
+                </Button>
+              </div>
+            ) : logsLoading ? (
+              <div className="text-center text-gray-500 py-20 flex flex-col items-center">
+                <Loader className="w-12 h-12 mb-4 opacity-40 animate-spin" />
+                <p className="font-medium" style={{fontSize: '1rem'}}>Loading your brews...</p>
+              </div>
+            ) : logs.length === 0 ? (
               <div className="text-center text-gray-500 py-20 flex flex-col items-center">
                 <History className="w-16 h-16 mb-4 opacity-20" />
                 <p className="font-medium" style={{fontSize: '1rem'}}>Your coffee journey begins here.</p>
