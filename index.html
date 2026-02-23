@@ -12,14 +12,60 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
   <style>
-    * { font-family: 'Nunito', sans-serif; }
-    body { -webkit-font-smoothing: antialiased; }
+    * { font-family: 'VT323', monospace; }
+    body { 
+      -webkit-font-smoothing: none;
+      image-rendering: pixelated;
+      background: #0a0a0a;
+    }
+    h1, h2, h3, .pixel-title { font-family: 'Press Start 2P', cursive; }
     .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0); }
     input[type="number"]::-webkit-inner-spin-button,
     input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     input[type="number"] { -moz-appearance: textfield; }
+    
+    /* Pixel border effect */
+    .pixel-border {
+      border: 4px solid;
+      border-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='6' height='6'%3E%3Crect width='2' height='2' fill='%239333ea'/%3E%3Crect x='2' width='2' height='2' fill='%237c3aed'/%3E%3Crect x='4' width='2' height='2' fill='%239333ea'/%3E%3Crect y='2' width='2' height='2' fill='%237c3aed'/%3E%3Crect x='2' y='2' width='2' height='2' fill='transparent'/%3E%3Crect x='4' y='2' width='2' height='2' fill='%237c3aed'/%3E%3Crect y='4' width='2' height='2' fill='%239333ea'/%3E%3Crect x='2' y='4' width='2' height='2' fill='%237c3aed'/%3E%3Crect x='4' y='4' width='2' height='2' fill='%239333ea'/%3E%3C/svg%3E") 2 stretch;
+    }
+    
+    /* Scanline effect */
+    .scanlines::after {
+      content: '';
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: repeating-linear-gradient(
+        0deg,
+        rgba(0,0,0,0.1) 0px,
+        rgba(0,0,0,0.1) 1px,
+        transparent 1px,
+        transparent 2px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+    
+    /* Glow effect */
+    .pixel-glow {
+      text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7, 0 0 30px #a855f7;
+    }
+    
+    /* Blink animation */
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+    .blink { animation: blink 1s infinite; }
+    
+    /* Bounce animation */
+    @keyframes bounce-pixel {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+    .bounce-pixel:hover { animation: bounce-pixel 0.3s ease-in-out; }
   </style>
 </head>
 <body>
@@ -229,14 +275,15 @@
 
     const Button = ({ children, onClick, variant = 'primary', className = '', disabled = false }) => {
       const variants = {
-        primary: "bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:from-purple-500 hover:to-purple-400 shadow-lg shadow-purple-500/25",
-        secondary: "bg-gray-800 text-gray-200 hover:bg-gray-700 border border-gray-700",
-        ghost: "text-gray-400 hover:bg-gray-800 hover:text-gray-200",
-        danger: "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30"
+        primary: "bg-purple-600 text-white hover:bg-purple-500 border-4 border-purple-400 hover:border-purple-300",
+        secondary: "bg-gray-900 text-gray-200 hover:bg-gray-800 border-4 border-gray-600",
+        ghost: "text-gray-400 hover:bg-gray-800 hover:text-gray-200 border-2 border-transparent",
+        danger: "bg-red-900 text-red-400 hover:bg-red-800 border-4 border-red-500"
       };
       return (
         <button onClick={onClick} disabled={disabled}
-          className={`px-4 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 ${variants[variant]} ${className}`}>
+          className={`px-4 py-3 font-semibold transition-all flex items-center justify-center gap-2 active:translate-y-1 disabled:opacity-50 text-lg tracking-wide ${variants[variant]} ${className}`}
+          style={{borderRadius: '0'}}>
           {children}
         </button>
       );
@@ -244,7 +291,8 @@
 
     const Card = ({ children, className = '', onClick, selected }) => (
       <div onClick={onClick} 
-        className={`bg-gray-900/80 rounded-2xl border p-4 backdrop-blur-sm transition-all ${selected ? 'border-purple-500 ring-2 ring-purple-500/30' : 'border-purple-500/20'} ${onClick ? 'cursor-pointer hover:border-gray-700' : ''} ${className}`}>
+        className={`bg-gray-900 border-4 p-4 transition-all ${selected ? 'border-purple-400 bg-purple-900/30' : 'border-gray-700'} ${onClick ? 'cursor-pointer hover:border-purple-500 hover:bg-gray-800 active:translate-y-1' : ''} ${className}`}
+        style={{borderRadius: '0'}}>
         {children}
       </div>
     );
@@ -303,9 +351,9 @@
       const SelectBrewerView = () => (
         <div className="space-y-6 pb-24">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-3">
               <Coffee className="w-8 h-8 text-purple-400" />
-              <h1 className="text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.75rem'}}>Brew Buddy</h1>
+              <h1 className="text-purple-400 pixel-glow" style={{fontSize: '1rem', letterSpacing: '2px'}}>BREW BUDDY</h1>
             </div>
             {authLoading ? <Loader className="w-5 h-5 text-gray-500 animate-spin" /> : user ? (
               <button onClick={signOut} className="w-9 h-9 rounded-full overflow-hidden border-2 border-purple-500/50">
@@ -316,19 +364,19 @@
             )}
           </div>
 
-          <div>
-            <h2 className="text-gray-400 font-semibold uppercase tracking-wider text-xs mb-3">Choose Your Brewer</h2>
+              <div>
+            <h2 className="text-green-400 uppercase tracking-wider mb-3 blink" style={{fontSize: '0.7rem'}}>► SELECT YOUR WEAPON ◄</h2>
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(BREWERS).map(([key, brewer]) => (
                 <Card key={key} onClick={() => { setSelectedBrewer(key); setView('recipe'); }} 
-                  className="flex flex-col items-center py-4 hover:bg-gray-800/50">
-                  <img src={brewer.image} alt={brewer.name} className="w-16 h-16 object-contain mb-2" />
-                  <span className="text-white font-semibold text-sm">{brewer.name}</span>
+                  className="flex flex-col items-center py-4 bounce-pixel">
+                  <img src={brewer.image} alt={brewer.name} className="w-16 h-16 object-contain mb-2" style={{imageRendering: 'pixelated'}} />
+                  <span className="text-purple-300 text-sm">{brewer.name.toUpperCase()}</span>
                 </Card>
-              ))}
-            </div>
-          </div>
-        </div>
+                  ))}
+                </div>
+              </div>
+                </div>
       );
 
       // STEP 2: Select Recipe
@@ -341,39 +389,39 @@
             <div className="flex items-center gap-3">
               <button onClick={() => setView('select')} className="text-gray-500 hover:text-white">
                 <ChevronLeft className="w-6 h-6" />
-              </button>
+                      </button>
               <div className="flex items-center gap-2">
                 <img src={brewer?.image} alt={brewer?.name} className="w-8 h-8 object-contain" />
                 <span className="text-white font-bold text-lg">{brewer?.name}</span>
               </div>
             </div>
 
-            <h2 className="text-gray-400 font-semibold uppercase tracking-wider text-xs">Select Recipe</h2>
+            <h2 className="text-green-400 uppercase tracking-wider" style={{fontSize: '0.7rem'}}>► CHOOSE RECIPE ◄</h2>
             
             <div className="space-y-3">
               {recipes.map((recipe) => (
                 <Card key={recipe.id} onClick={() => { setSelectedRecipe(recipe); setView('brew'); }}
-                  className="hover:bg-gray-800/50">
+                  className="bounce-pixel">
                   <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-white font-bold">{recipe.name}</h3>
-                    <span className="text-green-400 font-mono text-sm">{recipe.coffee}g : {recipe.water}g</span>
-                  </div>
+                    <h3 className="text-purple-300" style={{fontSize: '0.9rem'}}>{recipe.name.toUpperCase()}</h3>
+                    <span className="text-green-400 text-lg">{recipe.coffee}g:{recipe.water}g</span>
+                </div>
                   <div className="flex gap-4 text-gray-500 text-xs">
                     <span>Grind: {recipe.grind}</span>
                     <span>{recipe.temp}°C</span>
-                  </div>
+                </div>
                   <div className="flex gap-1 mt-3 overflow-x-auto">
                     {recipe.steps.map((step, i) => (
                       <span key={i} className="px-2 py-1 bg-gray-800 rounded text-xs text-gray-400 whitespace-nowrap">
                         {step.name} {step.water > 0 && `→ ${step.water}g`}
-                      </span>
+                    </span>
                     ))}
-                  </div>
-                </Card>
+              </div>
+          </Card>
               ))}
             </div>
-          </div>
-        );
+        </div>
+      );
       };
 
       // STEP 3: Brew Session with Visual Tracker
@@ -418,8 +466,8 @@
               <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
                 <Check className="w-10 h-10 text-green-400" />
               </div>
-              <h2 className="text-white text-2xl font-bold" style={{fontFamily: "'Fraunces', serif"}}>Brew Complete!</h2>
-              <p className="text-gray-400">Total time: {formatTime(totalTime)}</p>
+              <h2 className="text-green-400 pixel-glow" style={{fontSize: '1rem'}}>BREW COMPLETE!</h2>
+              <p className="text-gray-400 text-xl">TIME: {formatTime(totalTime)}</p>
               <Button onClick={() => setView('log')} className="w-full max-w-xs py-3">
                 Log This Brew <ChevronRight className="w-4 h-4" />
               </Button>
@@ -440,7 +488,7 @@
                 <div className="text-purple-400 font-semibold text-xs uppercase tracking-wider">{BREWERS[selectedBrewer]?.name}</div>
                 <div className="text-white font-bold">{recipe?.name}</div>
               </div>
-              <div className="text-gray-500 font-mono text-sm">{formatTime(totalTime)}</div>
+              <div className="text-green-400 text-lg">{formatTime(totalTime)}</div>
             </div>
 
             {/* Visual Step Tracker */}
@@ -448,39 +496,40 @@
               {steps.map((s, i) => (
                 <React.Fragment key={i}>
                   <div className={`flex flex-col items-center min-w-[60px] ${i <= currentStep ? 'opacity-100' : 'opacity-40'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold mb-1
-                      ${i < currentStep ? 'bg-green-500 text-white' : i === currentStep ? 'bg-purple-500 text-white' : 'bg-gray-700 text-gray-400'}`}>
+                    <div className={`w-8 h-8 flex items-center justify-center text-xs font-bold mb-1 border-2
+                      ${i < currentStep ? 'bg-green-500 text-black border-green-300' : i === currentStep ? 'bg-purple-500 text-white border-purple-300 blink' : 'bg-gray-800 text-gray-500 border-gray-600'}`}
+                      style={{borderRadius: '0'}}>
                       {i < currentStep ? <Check className="w-4 h-4" /> : i + 1}
-                    </div>
+                </div>
                     <span className="text-xs text-center text-gray-400 leading-tight">{s.name}</span>
                     {s.water > 0 && <span className="text-xs text-green-400 font-mono">{s.water}g</span>}
-                  </div>
+              </div>
                   {i < steps.length - 1 && (
-                    <div className={`h-0.5 w-6 ${i < currentStep ? 'bg-green-500' : 'bg-gray-700'}`} />
+                    <div className={`h-1 w-6 ${i < currentStep ? 'bg-green-400' : 'bg-gray-700'}`} />
                   )}
                 </React.Fragment>
               ))}
-            </div>
-
+                 </div>
+                 
             {/* Current Step Card */}
             <Card className="!p-6 border-purple-500/30">
               <div className="text-center space-y-4">
-                <div className="text-purple-400 font-semibold uppercase tracking-wider text-xs">Step {currentStep + 1} of {steps.length}</div>
-                <h3 className="text-white text-2xl font-bold" style={{fontFamily: "'Fraunces', serif"}}>{step?.name}</h3>
+                <div className="text-gray-500" style={{fontSize: '0.7rem'}}>STAGE {currentStep + 1}/{steps.length}</div>
+                <h3 className="text-purple-400 pixel-glow" style={{fontSize: '1rem'}}>{step?.name?.toUpperCase()}</h3>
                 <p className="text-gray-300 text-lg">{step?.instruction}</p>
                 
                 {step?.water > 0 && (
                   <div className="inline-block bg-purple-500/20 px-6 py-3 rounded-xl border border-purple-500/30">
                     <div className="text-green-400 text-3xl font-bold font-mono">{step.water}g</div>
                     <div className="text-purple-400/70 text-xs uppercase">Target</div>
-                  </div>
-                )}
+                   </div>
+                 )}
 
                 {/* Progress bar */}
-                <div className="w-full bg-gray-800 rounded-full h-2 mt-4">
-                  <div className="bg-purple-500 h-2 rounded-full transition-all duration-1000" style={{width: `${progress}%`}} />
+                <div className="w-full bg-gray-800 h-3 mt-4 border-2 border-gray-700" style={{borderRadius: '0'}}>
+                  <div className="bg-purple-500 h-full transition-all duration-1000" style={{width: `${progress}%`, borderRadius: '0'}} />
                 </div>
-                <div className="text-gray-500 font-mono text-sm">{formatTime(timeInStep)} / {formatTime(step?.duration || 0)}</div>
+                <div className="text-purple-400 text-lg">{formatTime(timeInStep)} / {formatTime(step?.duration || 0)}</div>
               </div>
             </Card>
 
@@ -491,15 +540,15 @@
                   <Play className="w-5 h-5" fill="currentColor" /> {totalTime > 0 ? 'Resume' : 'Start'}
                 </Button>
               ) : (
-                <>
+                 <>
                   <Button onClick={() => setIsRunning(false)} variant="secondary" className="py-4">
-                    <Pause className="w-5 h-5" fill="currentColor" /> Pause
-                  </Button>
+                      <Pause className="w-5 h-5" fill="currentColor" /> Pause
+                    </Button>
                   <Button onClick={() => { setIsRunning(false); setTimeInStep(0); setTotalTime(0); setCurrentStep(0); }} 
                     variant="danger" className="py-4">
                     <RotateCcw className="w-5 h-5" /> Reset
-                  </Button>
-                </>
+                    </Button>
+                 </>
               )}
             </div>
           </div>
@@ -553,24 +602,24 @@
 
             <Card className="space-y-4">
               <div>
-                <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Bean Name / Roaster</label>
+                <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Bean Name / Roaster</label>
                 <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)}
                   placeholder="e.g. Blue Bottle Hayes Valley"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                  className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Origin</label>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Origin</label>
                   <select value={origin} onChange={e => setOrigin(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                    className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                     {COUNTRIES.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Varietal</label>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Varietal</label>
                   <select value={varietal} onChange={e => setVarietal(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                    className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                     {VARIETALS.map(v => <option key={v}>{v}</option>)}
                   </select>
                 </div>
@@ -578,37 +627,37 @@
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Roast Level</label>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Level</label>
                   <select value={roast} onChange={e => setRoast(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                    className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                     <option value="light">Light</option>
                     <option value="medium">Medium</option>
                     <option value="dark">Dark</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Roast Date</label>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Date</label>
                   <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)}
-                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" style={{colorScheme:'dark'}} />
+                    className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{colorScheme:'dark', borderRadius: '0'}} />
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Rating</label>
-                <div className="flex gap-2 justify-center">
+                <label className="block text-gray-400 text-sm uppercase tracking-wider mb-2">RATING</label>
+                <div className="flex gap-3 justify-center">
                   {[1,2,3,4,5].map(s => (
-                    <button key={s} onClick={() => setRating(s)} className="transition-transform hover:scale-110">
-                      <Star className={`w-8 h-8 ${s <= rating ? 'text-green-400' : 'text-gray-700'}`} fill={s <= rating ? 'currentColor' : 'none'} />
-                    </button>
-                  ))}
+                    <button key={s} onClick={() => setRating(s)} className={`w-10 h-10 border-2 flex items-center justify-center transition-all ${s <= rating ? 'bg-green-500 border-green-300 text-black' : 'bg-gray-800 border-gray-600 text-gray-600'}`} style={{borderRadius: '0'}}>
+                      <Star className="w-5 h-5" fill="currentColor" />
+                  </button>
+                ))}
                 </div>
               </div>
 
               <div>
-                <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Tasting Notes</label>
+                <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Tasting Notes</label>
                 <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
                   placeholder="How did it taste?"
-                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white resize-none" />
+                  className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg resize-none focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
               </div>
             </Card>
 
@@ -637,56 +686,58 @@
         return (
           <div className="space-y-4 pb-24">
             <div className="flex items-center justify-between">
-              <h2 className="text-white font-bold text-xl" style={{fontFamily: "'Pacifico', cursive"}}>Journal</h2>
+              <h2 className="text-purple-400 pixel-glow" style={{fontSize: '0.9rem'}}>BREW LOG</h2>
               {user && (
-                <button onClick={() => setShowAdd(true)} className="w-9 h-9 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center">
+                <button onClick={() => setShowAdd(true)} className="w-9 h-9 bg-purple-900 border-2 border-purple-500 flex items-center justify-center hover:bg-purple-800" style={{borderRadius: '0'}}>
                   <Plus className="w-5 h-5 text-green-400" />
                 </button>
               )}
-            </div>
+          </div>
 
             {!user ? (
               <div className="text-center py-20">
-                <p className="text-gray-400 mb-4">Sign in to save your brews</p>
-                <Button onClick={signInWithGoogle}><LogIn className="w-4 h-4" /> Sign in with Google</Button>
+                <div className="text-4xl mb-4">🔐</div>
+                <p className="text-gray-400 mb-4 text-lg">SIGN IN TO SAVE</p>
+                <Button onClick={signInWithGoogle}><LogIn className="w-4 h-4" /> GOOGLE LOGIN</Button>
               </div>
             ) : logsLoading ? (
               <div className="text-center py-20"><Loader className="w-8 h-8 text-gray-500 animate-spin mx-auto" /></div>
             ) : logs.length === 0 ? (
               <div className="text-center py-20 text-gray-500">
-                <History className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                <p><button onClick={() => setView('select')} className="text-green-400 underline">Record your first brew</button> or add a past entry</p>
+                <div className="text-4xl mb-4">☕</div>
+                <p className="text-lg mb-2">NO ENTRIES YET</p>
+                <p className="text-sm"><button onClick={() => setView('select')} className="text-green-400 border-b-2 border-green-400 hover:text-green-300">START BREWING</button> or add a past entry</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {logs.map(log => (
                   <Card key={log.id} className="!p-4">
                     <div className="flex justify-between items-start mb-2">
-                      <div>
-                        <h3 className="text-white font-bold">{log.beanName || log.origin}</h3>
-                        <div className="flex gap-2 text-xs text-gray-500 mt-1">
-                          <span className="bg-gray-800 px-2 py-0.5 rounded">{log.varietal}</span>
+                     <div>
+                        <h3 className="text-purple-300 text-lg">{(log.beanName || log.origin || '').toUpperCase()}</h3>
+                        <div className="flex gap-2 text-sm text-gray-500 mt-1">
+                          <span className="bg-gray-800 border border-gray-700 px-2 py-0.5" style={{borderRadius: '0'}}>{log.varietal}</span>
                           <span>{log.date}</span>
-                        </div>
+                   </div>
                       </div>
                       {log.rating && (
-                        <div className="flex items-center gap-1 bg-purple-500/20 px-2 py-1 rounded-full">
+                        <div className="flex items-center gap-1 bg-purple-900 border-2 border-purple-500 px-2 py-1" style={{borderRadius: '0'}}>
                           <Star className="w-3 h-3 text-green-400" fill="currentColor" />
-                          <span className="text-green-400 text-xs font-bold">{log.rating}</span>
+                          <span className="text-green-400 text-sm font-bold">{log.rating}</span>
                         </div>
                       )}
-                    </div>
+                      </div>
                     <div className="flex gap-2 text-xs text-gray-400 mb-2">
                       <span>{BREWERS[log.method]?.name || log.method}</span>
                       <span>•</span>
                       <span>{log.coffee}g</span>
-                    </div>
+                      </div>
                     {log.notes && <p className="text-gray-500 text-sm italic">"{log.notes}"</p>}
                     <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-800">
                       <button onClick={() => setEditingLog(log)} className="text-gray-600 hover:text-green-400"><Edit className="w-4 h-4" /></button>
                       <button onClick={() => deleteLog(log.id)} className="text-gray-600 hover:text-red-400"><Trash className="w-4 h-4" /></button>
-                    </div>
-                  </Card>
+                   </div>
+                </Card>
                 ))}
               </div>
             )}
@@ -733,55 +784,59 @@
             </div>
             <Card className="space-y-3">
               <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)} placeholder="Bean name / Roaster"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+                className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
               <div className="grid grid-cols-2 gap-3">
-                <select value={origin} onChange={e => setOrigin(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                <select value={origin} onChange={e => setOrigin(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                   {COUNTRIES.map(c => <option key={c}>{c}</option>)}
                 </select>
-                <select value={varietal} onChange={e => setVarietal(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                <select value={varietal} onChange={e => setVarietal(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                   {VARIETALS.map(v => <option key={v}>{v}</option>)}
                 </select>
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <select value={roast} onChange={e => setRoast(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                <select value={roast} onChange={e => setRoast(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                   <option value="light">Light</option><option value="medium">Medium</option><option value="dark">Dark</option>
                 </select>
-                <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" style={{colorScheme:'dark'}} />
+                <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{colorScheme:'dark', borderRadius: '0'}} />
               </div>
               <div className="grid grid-cols-2 gap-3">
-                <select value={method} onChange={e => setMethod(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                <select value={method} onChange={e => setMethod(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                   {Object.entries(BREWERS).map(([k,v]) => <option key={k} value={k}>{v.name}</option>)}
                 </select>
                 <input type="number" value={coffee} onChange={e => setCoffee(Number(e.target.value))} placeholder="Coffee (g)"
-                  className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-center" />
+                  className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg text-center focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
               </div>
-              <div className="flex gap-2 justify-center py-2">
+              <div className="flex gap-3 justify-center py-2">
                 {[1,2,3,4,5].map(s => (
-                  <button key={s} onClick={() => setRating(s)}><Star className={`w-7 h-7 ${s <= rating ? 'text-green-400' : 'text-gray-700'}`} fill={s <= rating ? 'currentColor' : 'none'} /></button>
+                  <button key={s} onClick={() => setRating(s)} className={`w-10 h-10 border-2 flex items-center justify-center transition-all ${s <= rating ? 'bg-green-500 border-green-300 text-black' : 'bg-gray-800 border-gray-600 text-gray-600'}`} style={{borderRadius: '0'}}>
+                    <Star className="w-5 h-5" fill="currentColor" />
+                  </button>
                 ))}
               </div>
               <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Notes"
-                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white resize-none" />
+                className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg resize-none focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
             </Card>
             <Button onClick={handleSave} disabled={saving} className="w-full py-3">{saving ? 'Saving...' : 'Save'}</Button>
-          </div>
-        );
+        </div>
+      );
       };
 
       return (
-        <div className="min-h-screen bg-black text-gray-100">
+        <div className="min-h-screen bg-black text-gray-100 scanlines">
           {/* Bottom Nav */}
-          <nav className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur border-t border-gray-800 px-8 py-3 flex justify-around z-50 pb-safe">
-            <button onClick={() => { setView('select'); setSelectedBrewer(null); setSelectedRecipe(null); }}
-              className={`flex flex-col items-center gap-1 ${['select','recipe','brew','log'].includes(view) ? 'text-green-400' : 'text-gray-600'}`}>
+          <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t-4 border-purple-500 px-8 py-3 flex justify-around z-50 pb-safe">
+<button onClick={() => { setView('select'); setSelectedBrewer(null); setSelectedRecipe(null); }}
+              className={`flex flex-col items-center gap-1 px-4 py-1 border-2 ${['select','recipe','brew','log'].includes(view) ? 'text-green-400 border-green-400 bg-green-400/10' : 'text-gray-500 border-transparent'}`}
+              style={{borderRadius: '0'}}>
               <Coffee className="w-5 h-5" />
-              <span className="text-xs font-semibold">Brew</span>
-            </button>
+              <span style={{fontSize: '0.65rem'}}>BREW</span>
+             </button>
             <button onClick={() => setView('history')}
-              className={`flex flex-col items-center gap-1 ${view === 'history' ? 'text-green-400' : 'text-gray-600'}`}>
+              className={`flex flex-col items-center gap-1 px-4 py-1 border-2 ${view === 'history' ? 'text-green-400 border-green-400 bg-green-400/10' : 'text-gray-500 border-transparent'}`}
+              style={{borderRadius: '0'}}>
               <History className="w-5 h-5" />
-              <span className="text-xs font-semibold">Journal</span>
-            </button>
+              <span style={{fontSize: '0.65rem'}}>LOG</span>
+             </button>
           </nav>
 
           <main className="px-4 py-5 max-w-md mx-auto">
