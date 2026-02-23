@@ -733,26 +733,20 @@
             </Card>
 
             {/* Controls */}
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3">
               {step?.duration === 0 ? (
                 /* Manual step - just a continue button */
-                <Button onClick={() => { setCurrentStep(c => c + 1); setTimeInStep(0); }} className="col-span-2 py-4">
+                <Button onClick={() => { setCurrentStep(c => c + 1); setTimeInStep(0); }} className="py-4">
                   READY <ChevronRight className="w-5 h-5" />
                 </Button>
               ) : !isRunning ? (
-                <Button onClick={() => setIsRunning(true)} className="col-span-2 py-4">
+                <Button onClick={() => setIsRunning(true)} className="py-4">
                   <Play className="w-5 h-5" fill="currentColor" /> {totalTime > 0 ? 'RESUME' : 'START'}
                 </Button>
               ) : (
-                 <>
-                  <Button onClick={() => setIsRunning(false)} variant="secondary" className="py-4">
-                      <Pause className="w-5 h-5" fill="currentColor" /> PAUSE
-                    </Button>
-                  <Button onClick={() => { setIsRunning(false); setTimeInStep(0); setTotalTime(0); setCurrentStep(0); }} 
-                    variant="danger" className="py-4">
-                    <RotateCcw className="w-5 h-5" /> RESET
-                    </Button>
-                 </>
+                <Button onClick={() => setIsRunning(false)} variant="secondary" className="py-4">
+                  <Pause className="w-5 h-5" fill="currentColor" /> PAUSE
+                </Button>
               )}
             </div>
             <Button onClick={() => setView('log')} variant="ghost" className="w-full mt-2">
