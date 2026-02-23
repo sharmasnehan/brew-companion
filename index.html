@@ -130,32 +130,11 @@
     }
     .wiggle:hover { animation: wiggle 0.3s ease-in-out; }
     
-    /* Ember glow - soft crackly orange */
-    @keyframes ember-flicker {
-      0%, 100% { 
-        box-shadow: 0 0 8px 2px rgba(251, 146, 60, 0.3),
-                    0 0 16px 4px rgba(251, 146, 60, 0.15);
-      }
-      25% { 
-        box-shadow: 0 0 12px 3px rgba(251, 146, 60, 0.4),
-                    0 0 20px 6px rgba(251, 146, 60, 0.2);
-      }
-      50% { 
-        box-shadow: 0 0 6px 2px rgba(251, 146, 60, 0.25),
-                    0 0 14px 4px rgba(251, 146, 60, 0.12);
-      }
-      75% { 
-        box-shadow: 0 0 10px 3px rgba(251, 146, 60, 0.35),
-                    0 0 18px 5px rgba(251, 146, 60, 0.18);
-      }
-    }
+    /* Ember glow - constant orange */
     .ember-glow > div {
-      animation: ember-flicker 3s ease-in-out infinite;
+      box-shadow: 0 0 15px 4px rgba(251, 146, 60, 0.5),
+                  0 0 30px 8px rgba(251, 146, 60, 0.25);
     }
-    .ember-glow:nth-child(2) > div { animation-delay: 0.5s; }
-    .ember-glow:nth-child(3) > div { animation-delay: 1s; }
-    .ember-glow:nth-child(4) > div { animation-delay: 1.5s; }
-    .ember-glow:nth-child(5) > div { animation-delay: 2s; }
     
     /* ========================================
        DESIGN SYSTEM - Typography
