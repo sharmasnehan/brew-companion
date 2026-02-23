@@ -551,16 +551,13 @@
               </div>
             </div>
 
-            <div className="text-center py-4">
-              <h2 className="text-green-400 uppercase tracking-wider blink mb-2" style={{fontSize: '0.7rem'}}>» DESCRIBE YOUR BEANS «</h2>
-              <p className="text-gray-500 text-lg">We'll recommend the best recipe for you</p>
+            <div className="py-4">
+              <h2 className="text-green-400 uppercase tracking-wider blink" style={{fontSize: '0.7rem'}}>» DESCRIBE YOUR BEANS «</h2>
             </div>
 
             {/* Origin Dropdown */}
             <div className="space-y-2">
-              <label className="text-purple-400 text-sm uppercase tracking-wider flex items-center gap-2">
-                <span>🌍</span> ORIGIN
-              </label>
+              <label className="text-purple-400 text-sm uppercase tracking-wider">ORIGIN</label>
               <div className="relative">
                 <select 
                   value={origin} 
@@ -576,9 +573,7 @@
 
             {/* Processing Dropdown */}
             <div className="space-y-2">
-              <label className="text-purple-400 text-sm uppercase tracking-wider flex items-center gap-2">
-                <span>⚗️</span> PROCESSING
-              </label>
+              <label className="text-purple-400 text-sm uppercase tracking-wider">PROCESSING</label>
               <div className="relative">
                 <select 
                   value={processing} 
@@ -594,9 +589,7 @@
 
             {/* Roast Level */}
             <div className="space-y-2">
-              <label className="text-purple-400 text-sm uppercase tracking-wider flex items-center gap-2">
-                <span>🔥</span> ROAST LEVEL
-              </label>
+              <label className="text-purple-400 text-sm uppercase tracking-wider">ROAST LEVEL</label>
               <div className="grid grid-cols-3 gap-2">
                 {ROAST_LEVELS.map(level => (
                   <button
@@ -660,9 +653,7 @@
             {/* Show bean profile summary if set */}
             {hasRecommendations && (
               <div className="bg-gray-900/50 border-2 border-orange-500/30 px-4 py-3" style={{borderRadius: '0'}}>
-                <div className="flex items-center gap-2 text-orange-400 text-sm mb-1">
-                  <span>✨</span> MATCHING YOUR BEANS
-                </div>
+                <div className="text-orange-400 text-sm mb-1 uppercase tracking-wider">MATCHING YOUR BEANS</div>
                 <div className="text-gray-400 text-lg">
                   {[beanProfile.origin, beanProfile.processing, beanProfile.roast].filter(Boolean).join(' • ')}
                 </div>
@@ -683,9 +674,7 @@
                       isRecommended ? 'border-orange-500' : 'border-gray-700 hover:border-purple-500'
                     }`} style={{borderRadius: '0'}}>
                       {isRecommended && (
-                        <div className="flex items-center gap-2 text-orange-400 text-sm mb-2">
-                          <span>⭐</span> RECOMMENDED FOR YOUR BEANS
-                        </div>
+                        <div className="text-orange-400 text-sm mb-2 uppercase tracking-wider">RECOMMENDED FOR YOUR BEANS</div>
                       )}
                       <div className="flex justify-between items-start mb-2">
                         <h3 className="text-purple-300" style={{fontSize: '0.9rem'}}>{recipe.name.toUpperCase()}</h3>
