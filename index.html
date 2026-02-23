@@ -550,7 +550,16 @@
         const timerRef = useRef(null);
 
         const recipe = selectedRecipe;
-        const steps = recipe?.steps || [];
+        
+        // Add prep step at the beginning
+        const prepStep = {
+          name: 'Prep',
+          water: 0,
+          duration: 0,
+          instruction: `Grind ${recipe?.coffee}g ${recipe?.grind}. Heat water to ${recipe?.temp}°C / ${cToF(recipe?.temp)}°F`,
+          isPrep: true
+        };
+        const steps = [prepStep, ...(recipe?.steps || [])];
         const step = steps[currentStep];
 
         useEffect(() => {
