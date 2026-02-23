@@ -129,6 +129,62 @@
       75% { transform: rotate(3deg); }
     }
     .wiggle:hover { animation: wiggle 0.3s ease-in-out; }
+    
+    /* ========================================
+       DESIGN SYSTEM - Typography
+       ======================================== */
+    
+    /* Section Headers - pixel font, small, uppercase, green with blink */
+    .ds-section-header {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #4ade80; /* green-400 */
+    }
+    
+    /* Page Titles - pixel font with glow */
+    .ds-page-title {
+      font-family: 'Press Start 2P', cursive;
+      font-size: 1rem;
+      color: #c084fc; /* purple-400 */
+      text-shadow: 0 0 10px #a855f7, 0 0 20px #a855f7, 0 0 30px #a855f7;
+    }
+    
+    /* Card Title - main focal point, large */
+    .ds-card-title {
+      font-size: 1.5rem; /* 24px */
+      color: #ffffff;
+      line-height: 1.2;
+    }
+    
+    /* Card Body - secondary info */
+    .ds-card-body {
+      font-size: 1.25rem; /* 20px */
+      color: #d1d5db; /* gray-300 */
+    }
+    
+    /* Card Meta - tertiary info, smaller */
+    .ds-card-meta {
+      font-size: 1.125rem; /* 18px */
+      color: #9ca3af; /* gray-400 */
+    }
+    
+    /* Card Footer - smallest, muted */
+    .ds-card-footer {
+      font-size: 1rem; /* 16px */
+      color: #6b7280; /* gray-500 */
+    }
+    
+    /* Accent text - green highlights */
+    .ds-accent {
+      color: #4ade80; /* green-400 */
+    }
+    
+    /* Purple accent */
+    .ds-accent-purple {
+      color: #d8b4fe; /* purple-300 */
+    }
   </style>
 </head>
 <body>
@@ -521,22 +577,21 @@
                   className="bounce-pixel">
                   {/* Taste Profile - Focal Point */}
                   {recipe.taste && (
-                    <p className="text-white text-2xl mb-3">{recipe.taste}</p>
+                    <p className="ds-card-title mb-3">{recipe.taste}</p>
                   )}
                   
                   {/* Best For */}
                   {recipe.bestFor && (
-                    <div className="text-lg text-gray-400 mb-4">
-                      <span className="text-green-400">Recommended for:</span> {recipe.bestFor}
+                    <div className="ds-card-meta mb-4">
+                      <span className="ds-accent">Recommended for:</span> {recipe.bestFor}
                     </div>
                   )}
                   
                   <div className="flex justify-between items-center">
-                    <span className="text-purple-300" style={{fontSize: '0.8rem'}}>{recipe.name.toUpperCase()}</span>
+                    <span className="ds-card-footer ds-accent-purple">{recipe.name.toUpperCase()}</span>
                     {recipe.source && (
                       <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
-                        className="text-gray-500 hover:text-purple-400 uppercase tracking-wider flex items-center gap-1"
-                        style={{fontSize: '0.7rem'}}
+                        className="ds-card-footer hover:text-purple-400 uppercase tracking-wider flex items-center gap-1"
                         onClick={(e) => e.stopPropagation()}>
                         SOURCE <ExternalLink className="w-3 h-3" />
                       </a>
@@ -926,17 +981,17 @@
                 {logs.map(log => (
                   <Card key={log.id} className="bounce-pixel">
                     {/* Bean name as focal point */}
-                    <h3 className="text-white text-2xl mb-2">{log.beanName || log.origin || 'Unknown'}</h3>
+                    <h3 className="ds-card-title mb-2">{log.beanName || log.origin || 'Unknown'}</h3>
                     
                     {/* Origin & Varietal */}
-                    <div className="text-lg text-gray-400 mb-3">
-                      {log.origin && <span className="text-green-400">{log.origin}</span>}
+                    <div className="ds-card-meta mb-3">
+                      {log.origin && <span className="ds-accent">{log.origin}</span>}
                       {log.origin && log.varietal && <span> • </span>}
                       {log.varietal && <span>{log.varietal}</span>}
                     </div>
                     
                     {/* Notes */}
-                    {log.notes && <p className="text-gray-300 text-xl italic mb-3">{log.notes}</p>}
+                    {log.notes && <p className="ds-card-body italic mb-3">{log.notes}</p>}
                     
                     {/* Rating */}
                     {log.rating && (
@@ -952,8 +1007,8 @@
                     
                     {/* Footer */}
                     <div className="flex justify-between items-center">
-                      <div className="text-gray-500" style={{fontSize: '0.8rem'}}>
-                        <span className="text-purple-300">{BREWERS[log.method]?.name || log.method}</span>
+                      <div className="ds-card-footer">
+                        <span className="ds-accent-purple">{BREWERS[log.method]?.name || log.method}</span>
                         {log.coffee && <span> • {log.coffee}g</span>}
                         <span> • {log.date}</span>
                       </div>
