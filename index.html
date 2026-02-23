@@ -510,29 +510,23 @@
               {recipes.map((recipe) => (
                 <Card key={recipe.id} onClick={() => { setSelectedRecipe(recipe); setView('brew'); }}
                   className="bounce-pixel">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-purple-300" style={{fontSize: '0.9rem'}}>{recipe.name.toUpperCase()}</h3>
-                    <span className="text-green-400 text-xl">{recipe.coffee}g:{recipe.water}g</span>
-                  </div>
-                  
-                  {/* Taste Profile */}
+                  {/* Taste Profile - Focal Point */}
                   {recipe.taste && (
-                    <p className="text-gray-300 text-xl italic mb-2">{recipe.taste}</p>
+                    <p className="text-white text-2xl mb-3">{recipe.taste}</p>
                   )}
+                  
+                  {/* Ratio */}
+                  <div className="text-green-400 text-xl mb-2">{recipe.coffee}g : {recipe.water}g</div>
                   
                   {/* Best For */}
                   {recipe.bestFor && (
                     <div className="text-lg text-gray-400 mb-3">
-                      <span className="text-green-400">Try with:</span> {recipe.bestFor}
+                      <span className="text-purple-400">Recommended for:</span> {recipe.bestFor}
                     </div>
                   )}
                   
                   <div className="flex justify-between items-center text-gray-500 text-lg border-t border-gray-700 pt-3 mt-2">
-                    <div className="flex gap-3">
-                      <span>{recipe.grind}</span>
-                      <span>•</span>
-                      <span>{recipe.temp}°C / {cToF(recipe.temp)}°F</span>
-                    </div>
+                    <span className="text-purple-300" style={{fontSize: '0.8rem'}}>{recipe.name.toUpperCase()}</span>
                     {recipe.source && (
                       <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
                         className="flex items-center gap-1 text-purple-400 hover:text-purple-300"
