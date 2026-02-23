@@ -139,6 +139,7 @@
           source: 'https://lacabra.dk/blogs/journal/hario-switch-recipe',
           taste: 'Balanced, clean, lightly sweet',
           bestFor: 'Washed Ethiopia, Kenya, Guatemala',
+          stats: { body: 2, clarity: 4, sweetness: 3, acidity: 3 },
           steps: [
             { name: 'Add Coffee', water: 0, duration: 0, instruction: 'Rinse filter, add 15g coffee with switch CLOSED' },
             { name: 'Bloom', water: 60, duration: 45, instruction: 'Pour 60g water for bloom' },
@@ -156,6 +157,7 @@
           source: 'https://www.youtube.com/watch?v=QjIvLsON5mo',
           taste: 'Sweet, round, fuller body',
           bestFor: 'Natural Ethiopia, Honey Costa Rica',
+          stats: { body: 4, clarity: 2, sweetness: 4, acidity: 2 },
           steps: [
             { name: 'First Pour', water: 150, duration: 10, instruction: 'Add 150g water and stir' },
             { name: 'Steep', water: 150, duration: 60, instruction: 'Wait 60 seconds' },
@@ -175,6 +177,7 @@
           source: 'https://kaldiscoffee.com/blogs/news/hario-v60-brew-guide',
           taste: 'Bright, crisp, high clarity',
           bestFor: 'Washed Ethiopia, Rwanda, Burundi',
+          stats: { body: 1, clarity: 5, sweetness: 2, acidity: 4 },
           steps: [
             { name: 'Bloom', water: 40, duration: 40, instruction: 'Pour 40g, swirl gently' },
             { name: 'Main Pour', water: 256, duration: 100, instruction: 'Pour steadily to 256g' },
@@ -191,6 +194,7 @@
           source: 'https://www.youtube.com/watch?v=AI4ynXzkSQo',
           taste: 'Sweet, rounded, still clean',
           bestFor: 'Washed Colombia, Honey Guatemala',
+          stats: { body: 2, clarity: 4, sweetness: 4, acidity: 3 },
           steps: [
             { name: 'Bloom', water: 60, duration: 45, instruction: 'Pour 60g bloom, swirl' },
             { name: 'Pour 2', water: 120, duration: 30, instruction: 'Pour to 120g' },
@@ -212,6 +216,7 @@
           source: 'https://aeropress.com/pages/how-to-brew',
           taste: 'Comforting, balanced, chocolate-forward',
           bestFor: 'Brazil natural, Colombia medium roast',
+          stats: { body: 3, clarity: 3, sweetness: 4, acidity: 2 },
           steps: [
             { name: 'Add Water', water: 200, duration: 10, instruction: 'Add all 200g water' },
             { name: 'Stir', water: 200, duration: 10, instruction: 'Stir 3 times' },
@@ -230,6 +235,7 @@
           source: 'https://aeropress.com/pages/wac-recipes',
           taste: 'Intense, juicy, aromatic',
           bestFor: 'Natural Ethiopia, Anaerobic Colombia',
+          stats: { body: 5, clarity: 3, sweetness: 5, acidity: 4 },
           steps: [
             { name: 'Add Water', water: 100, duration: 10, instruction: 'Add 100g water' },
             { name: 'Stir', water: 100, duration: 10, instruction: 'Stir gently' },
@@ -249,6 +255,7 @@
           source: 'https://www.georgehowellcoffee.com/brew-guide/chemex/',
           taste: 'Elegant, ultra-clean, bright',
           bestFor: 'Washed Ethiopia, Kenya, light Panama',
+          stats: { body: 1, clarity: 5, sweetness: 2, acidity: 5 },
           steps: [
             { name: 'Bloom', water: 65, duration: 45, instruction: 'Pour 65g, let bloom' },
             { name: 'Pour 1', water: 250, duration: 60, instruction: 'Pour slowly to 250g' },
@@ -267,6 +274,7 @@
           source: 'https://madcapcoffee.com/brew-guides/chemex/',
           taste: 'Clean but richer, gentle sweetness',
           bestFor: 'Colombia, Costa Rica, Guatemala',
+          stats: { body: 2, clarity: 4, sweetness: 3, acidity: 3 },
           steps: [
             { name: 'Bloom', water: 80, duration: 45, instruction: 'Pour 80g bloom' },
             { name: 'Pour 1', water: 280, duration: 60, instruction: 'Pour to 280g' },
@@ -286,6 +294,7 @@
           temp: 93,
           taste: 'Balanced, sweet, structured',
           bestFor: 'Medium roast espresso blends',
+          stats: { body: 4, clarity: 3, sweetness: 4, acidity: 2 },
           steps: [
             { name: 'Extract', water: 36, duration: 28, instruction: '18g in → 36g out in 25-30s' }
           ]
@@ -299,6 +308,7 @@
           temp: 93,
           taste: 'Thick, sweet, punchy',
           bestFor: 'Light-medium roast, Honey Central America',
+          stats: { body: 5, clarity: 2, sweetness: 5, acidity: 1 },
           steps: [
             { name: 'Extract', water: 25, duration: 23, instruction: '18g in → 25g out in 20-25s' }
           ]
@@ -435,24 +445,45 @@
               {recipes.map((recipe) => (
                 <Card key={recipe.id} onClick={() => { setSelectedRecipe(recipe); setView('brew'); }}
                   className="bounce-pixel">
-                  <div className="flex justify-between items-start mb-2">
+                  <div className="flex justify-between items-start mb-3">
                     <h3 className="text-purple-300" style={{fontSize: '0.9rem'}}>{recipe.name.toUpperCase()}</h3>
                     <span className="text-green-400 text-xl">{recipe.coffee}g:{recipe.water}g</span>
                 </div>
                   
                   {/* Taste Profile */}
                   {recipe.taste && (
-                    <p className="text-gray-300 text-lg italic mb-2">"{recipe.taste}"</p>
+                    <p className="text-gray-300 text-xl italic mb-3">"{recipe.taste}"</p>
+                  )}
+                  
+                  {/* Stats - Video Game Style */}
+                  {recipe.stats && (
+                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-3">
+                      {[
+                        { key: 'body', label: 'BODY', color: 'bg-amber-500' },
+                        { key: 'clarity', label: 'CLARITY', color: 'bg-cyan-400' },
+                        { key: 'sweetness', label: 'SWEET', color: 'bg-pink-500' },
+                        { key: 'acidity', label: 'ACID', color: 'bg-lime-400' }
+                      ].map(stat => (
+                        <div key={stat.key} className="flex items-center gap-2">
+                          <span className="text-gray-500 text-sm w-14">{stat.label}</span>
+                          <div className="flex gap-0.5 flex-1">
+                            {[1,2,3,4,5].map(i => (
+                              <div key={i} className={`h-3 flex-1 ${i <= recipe.stats[stat.key] ? stat.color : 'bg-gray-700'}`} style={{borderRadius: '0'}} />
+                            ))}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   )}
                   
                   {/* Best For */}
                   {recipe.bestFor && (
-                    <div className="text-sm text-gray-500 mb-3">
+                    <div className="text-lg text-gray-400 mb-3">
                       <span className="text-green-400">Try with:</span> {recipe.bestFor}
                     </div>
                   )}
                   
-                  <div className="flex gap-4 text-gray-500 text-sm border-t border-gray-700 pt-3 mt-2">
+                  <div className="flex gap-4 text-gray-500 text-lg border-t border-gray-700 pt-3 mt-2">
                     <span>{recipe.grind}</span>
                     <span>•</span>
                     <span>{recipe.temp}°C / {cToF(recipe.temp)}°F</span>
@@ -460,9 +491,9 @@
                   
                   {recipe.source && (
                     <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
-                      className="flex items-center gap-1 text-purple-400 text-sm mt-2 hover:text-purple-300"
+                      className="flex items-center gap-1 text-purple-400 text-lg mt-2 hover:text-purple-300"
                       onClick={(e) => e.stopPropagation()}>
-                      <ExternalLink className="w-3 h-3" /> SOURCE
+                      <ExternalLink className="w-4 h-4" /> SOURCE
                     </a>
                   )}
           </Card>
