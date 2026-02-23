@@ -445,35 +445,14 @@
               {recipes.map((recipe) => (
                 <Card key={recipe.id} onClick={() => { setSelectedRecipe(recipe); setView('brew'); }}
                   className="bounce-pixel">
-                  <div className="flex justify-between items-start mb-3">
+                  <div className="flex justify-between items-start mb-2">
                     <h3 className="text-purple-300" style={{fontSize: '0.9rem'}}>{recipe.name.toUpperCase()}</h3>
                     <span className="text-green-400 text-xl">{recipe.coffee}g:{recipe.water}g</span>
                 </div>
                   
                   {/* Taste Profile */}
                   {recipe.taste && (
-                    <p className="text-gray-300 text-xl italic mb-3">"{recipe.taste}"</p>
-                  )}
-                  
-                  {/* Stats - Video Game Style */}
-                  {recipe.stats && (
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-3">
-                      {[
-                        { key: 'body', label: 'BODY', color: 'bg-amber-500' },
-                        { key: 'clarity', label: 'CLARITY', color: 'bg-cyan-400' },
-                        { key: 'sweetness', label: 'SWEET', color: 'bg-pink-500' },
-                        { key: 'acidity', label: 'ACID', color: 'bg-lime-400' }
-                      ].map(stat => (
-                        <div key={stat.key} className="flex items-center gap-2">
-                          <span className="text-gray-500 text-sm w-14">{stat.label}</span>
-                          <div className="flex gap-0.5 flex-1">
-                            {[1,2,3,4,5].map(i => (
-                              <div key={i} className={`h-3 flex-1 ${i <= recipe.stats[stat.key] ? stat.color : 'bg-gray-700'}`} style={{borderRadius: '0'}} />
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                    <p className="text-gray-300 text-xl italic mb-2">{recipe.taste}</p>
                   )}
                   
                   {/* Best For */}
@@ -483,19 +462,20 @@
                     </div>
                   )}
                   
-                  <div className="flex gap-4 text-gray-500 text-lg border-t border-gray-700 pt-3 mt-2">
-                    <span>{recipe.grind}</span>
-                    <span>•</span>
-                    <span>{recipe.temp}°C / {cToF(recipe.temp)}°F</span>
+                  <div className="flex justify-between items-center text-gray-500 text-lg border-t border-gray-700 pt-3 mt-2">
+                    <div className="flex gap-3">
+                      <span>{recipe.grind}</span>
+                      <span>•</span>
+                      <span>{recipe.temp}°C / {cToF(recipe.temp)}°F</span>
+                    </div>
+                    {recipe.source && (
+                      <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
+                        className="flex items-center gap-1 text-purple-400 hover:text-purple-300"
+                        onClick={(e) => e.stopPropagation()}>
+                        <ExternalLink className="w-4 h-4" />
+                      </a>
+                    )}
                 </div>
-                  
-                  {recipe.source && (
-                    <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
-                      className="flex items-center gap-1 text-purple-400 text-lg mt-2 hover:text-purple-300"
-                      onClick={(e) => e.stopPropagation()}>
-                      <ExternalLink className="w-4 h-4" /> SOURCE
-                    </a>
-                  )}
           </Card>
               ))}
             </div>
