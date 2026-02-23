@@ -776,7 +776,7 @@
         const [roast, setRoast] = useState(log?.roast || 'medium');
         const [roastDate, setRoastDate] = useState(log?.roastDate || '');
         const [method, setMethod] = useState(log?.method || 'v60');
-        const [coffee, setCoffee] = useState(log?.coffee || 16);
+        const [coffee, setCoffee] = useState(log?.coffee || '');
         const [rating, setRating] = useState(log?.rating || 0);
         const [notes, setNotes] = useState(log?.notes || '');
         const [saving, setSaving] = useState(false);
@@ -785,7 +785,7 @@
           setSaving(true);
           const data = {
             user_id: user.id, roaster: beanName, origin, varietal, roast,
-            roast_date: roastDate || null, method, coffee_amount: coffee,
+            roast_date: roastDate || null, method, coffee_amount: coffee || null,
             ratio: 0, rating: rating || null, notes
           };
           let result;
@@ -800,46 +800,82 @@
         };
 
         return (
-          <div className="space-y-4 pb-24">
+          <div className="space-y-5 pb-24">
             <div className="flex items-center gap-3">
-              <button onClick={onClose} className="text-gray-500 hover:text-white"><X className="w-6 h-6" /></button>
-              <h2 className="text-white font-bold">{log ? 'Edit Entry' : 'Add Entry'}</h2>
+              <button onClick={onClose} className="text-gray-500 hover:text-white"><ChevronLeft className="w-6 h-6" /></button>
+              <h2 className="text-white font-bold text-lg">{log ? 'Edit Entry' : 'Add Entry'}</h2>
             </div>
-            <Card className="space-y-3">
-              <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)} placeholder="Bean name / Roaster"
-                className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
+            
+            <Card className="space-y-4">
+              <div>
+                <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Bean Name / Roaster</label>
+                <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)} 
+                  placeholder="e.g. Blue Bottle Hayes Valley"
+                  className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
+              </div>
+
               <div className="grid grid-cols-2 gap-3">
-                <select value={origin} onChange={e => setOrigin(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
-                  {COUNTRIES.map(c => <option key={c}>{c}</option>)}
-                </select>
-                <select value={varietal} onChange={e => setVarietal(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
-                  {VARIETALS.map(v => <option key={v}>{v}</option>)}
-                </select>
+                <div>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Origin</label>
+                  <select value={origin} onChange={e => setOrigin(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
+                    {COUNTRIES.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Varietal</label>
+                  <select value={varietal} onChange={e => setVarietal(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
+                    {VARIETALS.map(v => <option key={v}>{v}</option>)}
+                  </select>
+                </div>
               </div>
+
               <div className="grid grid-cols-2 gap-3">
-                <select value={roast} onChange={e => setRoast(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
-                  <option value="light">Light</option><option value="medium">Medium</option><option value="dark">Dark</option>
-                </select>
-                <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{colorScheme:'dark', borderRadius: '0'}} />
+                <div>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Level</label>
+                  <select value={roast} onChange={e => setRoast(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
+                    <option value="light">Light</option><option value="medium">Medium</option><option value="dark">Dark</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Date</label>
+                  <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{colorScheme:'dark', borderRadius: '0'}} />
+                </div>
               </div>
+
               <div className="grid grid-cols-2 gap-3">
-                <select value={method} onChange={e => setMethod(e.target.value)} className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
-                  {Object.entries(BREWERS).map(([k,v]) => <option key={k} value={k}>{v.name}</option>)}
-                </select>
-                <input type="number" value={coffee} onChange={e => setCoffee(Number(e.target.value))} placeholder="Coffee (g)"
-                  className="bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg text-center focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
+                <div>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Brew Method</label>
+                  <select value={method} onChange={e => setMethod(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
+                    {Object.entries(BREWERS).map(([k,v]) => <option key={k} value={k}>{v.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Coffee (g)</label>
+                  <input type="number" value={coffee} onChange={e => setCoffee(e.target.value === '' ? '' : Number(e.target.value))} 
+                    placeholder="e.g. 18"
+                    className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg text-center focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
+                </div>
               </div>
-              <div className="flex gap-3 justify-center py-2">
-                {[1,2,3,4,5].map(s => (
-                  <button key={s} onClick={() => setRating(s)} className={`w-10 h-10 border-2 flex items-center justify-center transition-all ${s <= rating ? 'bg-green-500 border-green-300 text-black' : 'bg-gray-800 border-gray-600 text-gray-600'}`} style={{borderRadius: '0'}}>
-                    <Star className="w-5 h-5" fill="currentColor" />
-                  </button>
-                ))}
+
+              <div>
+                <label className="block text-gray-400 text-sm uppercase tracking-wider mb-2">Rating</label>
+                <div className="flex gap-3 justify-center">
+                  {[1,2,3,4,5].map(s => (
+                    <button key={s} onClick={() => setRating(s)} className={`w-10 h-10 border-2 flex items-center justify-center transition-all ${s <= rating ? 'bg-green-500 border-green-300 text-black' : 'bg-gray-800 border-gray-600 text-gray-600'}`} style={{borderRadius: '0'}}>
+                      <Star className="w-5 h-5" fill="currentColor" />
+                    </button>
+                  ))}
+                </div>
               </div>
-              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Notes"
-                className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg resize-none focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
+
+              <div>
+                <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Tasting Notes</label>
+                <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="How did it taste?"
+                  className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg resize-none focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
+              </div>
             </Card>
-            <Button onClick={handleSave} disabled={saving} className="w-full py-3">{saving ? 'Saving...' : 'Save'}</Button>
+            
+            <Button onClick={handleSave} disabled={saving} className="w-full py-3">{saving ? 'SAVING...' : 'SAVE'}</Button>
         </div>
       );
       };
