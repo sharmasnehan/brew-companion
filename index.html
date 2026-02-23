@@ -101,7 +101,7 @@
       padding: 3px;
       background: linear-gradient(90deg, transparent, #fb923c, transparent);
       background-size: 200% 100%;
-      animation: border-flow 4s linear infinite;
+      animation: border-flow 6s linear infinite;
       -webkit-mask: 
         linear-gradient(#fff 0 0) content-box, 
         linear-gradient(#fff 0 0);
@@ -114,8 +114,13 @@
     }
     @keyframes border-flow {
       0% { background-position: 0% 50%; }
-      100% { background-position: 300% 50%; }
+      100% { background-position: 200% 50%; }
     }
+    .border-delay-1::before { animation-delay: 0s; }
+    .border-delay-2::before { animation-delay: 1.2s; }
+    .border-delay-3::before { animation-delay: 2.4s; }
+    .border-delay-4::before { animation-delay: 3.6s; }
+    .border-delay-5::before { animation-delay: 4.8s; }
     
     /* Wiggle animation */
     @keyframes wiggle {
@@ -170,7 +175,9 @@
     const Trash = (props) => <Icon name="Trash2" {...props} />;
     const Edit = (props) => <Icon name="Pencil" {...props} />;
 
-    const COUNTRIES = ['Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 'Nepal', 'India', 'Other'];
+    const COUNTRIES = ['Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 'Nepal', 'India', 'Rwanda', 'Burundi', 'Other'];
+    const PROCESSING = ['Washed', 'Natural', 'Honey', 'Anaerobic', 'Other'];
+    const ROAST_LEVELS = ['Light', 'Medium', 'Dark'];
     const VARIETALS = ['Heirloom', 'Bourbon', 'Typica', 'Caturra', 'Catuai', 'Geisha', 'SL-28', 'SL-34', 'Pacamara', 'Castillo', 'Blend', 'Other'];
 
     // Helper to convert Celsius to Fahrenheit
@@ -399,13 +406,45 @@
     );
 
     function App() {
-      const [view, setView] = useState('select'); // select, recipe, brew, log, history
+      const [view, setView] = useState('select'); // select, beans, recipe, brew, log, history
       const [selectedBrewer, setSelectedBrewer] = useState(null);
       const [selectedRecipe, setSelectedRecipe] = useState(null);
+      const [beanProfile, setBeanProfile] = useState({ origin: '', processing: '', roast: '' });
       const [logs, setLogs] = useState([]);
       const [user, setUser] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
       const [logsLoading, setLogsLoading] = useState(false);
+
+      // Recipe recommendation logic
+      const getRecommendedRecipes = (brewer, profile) => {
+        const recipes = RECIPES[brewer] || [];
+        if (!profile.origin && !profile.processing && !profile.roast) return [];
+        
+        return recipes.filter(recipe => {
+          const bestFor = (recipe.bestFor || '').toLowerCase();
+          let score = 0;
+          
+          // Check origin match
+          if (profile.origin && bestFor.includes(profile.origin.toLowerCase())) score += 2;
+          
+          // Check processing match
+          if (profile.processing) {
+            if (bestFor.includes(profile.processing.toLowerCase())) score += 2;
+            // Special cases
+            if (profile.processing === 'Natural' && bestFor.includes('fruit-forward')) score += 1;
+            if (profile.processing === 'Washed' && (bestFor.includes('clean') || bestFor.includes('bright'))) score += 1;
+          }
+          
+          // Check roast match
+          if (profile.roast) {
+            if (bestFor.includes(profile.roast.toLowerCase())) score += 2;
+            if (profile.roast === 'Light' && (bestFor.includes('light') || bestFor.includes('floral') || bestFor.includes('tea-like'))) score += 1;
+            if (profile.roast === 'Medium' && bestFor.includes('medium')) score += 1;
+          }
+          
+          return score >= 2;
+        }).map(r => r.id);
+      };
 
       // Auth
       useEffect(() => {
@@ -469,8 +508,8 @@
             <h2 className="text-green-400 uppercase tracking-wider mb-4 blink" style={{fontSize: '0.7rem'}}>» SELECT YOUR WEAPON «</h2>
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(BREWERS).map(([key, brewer], index) => (
-                <div key={key} onClick={() => { setSelectedBrewer(key); setView('recipe'); }} 
-                  className="border-animate cursor-pointer">
+                <div key={key} onClick={() => { setSelectedBrewer(key); setBeanProfile({ origin: '', processing: '', roast: '' }); setView('beans'); }} 
+                  className={`border-animate border-delay-${index + 1} cursor-pointer`}>
                   <div className="bg-gray-900 p-4 flex flex-col items-center hover:bg-gray-800 transition-colors">
                     <img src={brewer.image} alt={brewer.name} className="w-16 h-16 object-contain mb-2" style={{imageRendering: 'pixelated'}} />
                     <span className="text-purple-300 text-lg">{brewer.name.toUpperCase()}</span>
@@ -482,65 +521,210 @@
                 </div>
       );
 
-      // STEP 2: Select Recipe
-      const SelectRecipeView = () => {
-        const recipes = RECIPES[selectedBrewer] || [];
+      // STEP 2: Bean Profile Selection
+      const BeanProfileView = () => {
         const brewer = BREWERS[selectedBrewer];
+        const [origin, setOrigin] = useState(beanProfile.origin);
+        const [processing, setProcessing] = useState(beanProfile.processing);
+        const [roast, setRoast] = useState(beanProfile.roast);
+
+        const handleContinue = () => {
+          setBeanProfile({ origin, processing, roast });
+          setView('recipe');
+        };
+
+        const handleSkip = () => {
+          setBeanProfile({ origin: '', processing: '', roast: '' });
+          setView('recipe');
+        };
 
         return (
-          <div className="space-y-5 pb-24">
+          <div className="space-y-6 pb-24">
+            {/* Header */}
             <div className="flex items-center gap-3">
               <button onClick={() => setView('select')} className="text-gray-500 hover:text-white">
                 <ChevronLeft className="w-6 h-6" />
-                      </button>
+              </button>
               <div className="flex items-center gap-2">
                 <img src={brewer?.image} alt={brewer?.name} className="w-8 h-8 object-contain" />
                 <span className="text-white font-bold text-lg">{brewer?.name}</span>
               </div>
             </div>
 
+            <div className="text-center py-4">
+              <h2 className="text-green-400 uppercase tracking-wider blink mb-2" style={{fontSize: '0.7rem'}}>» DESCRIBE YOUR BEANS «</h2>
+              <p className="text-gray-500 text-lg">We'll recommend the best recipe for you</p>
+            </div>
+
+            {/* Origin Dropdown */}
+            <div className="space-y-2">
+              <label className="text-purple-400 text-sm uppercase tracking-wider flex items-center gap-2">
+                <span>🌍</span> ORIGIN
+              </label>
+              <div className="relative">
+                <select 
+                  value={origin} 
+                  onChange={e => setOrigin(e.target.value)}
+                  className="w-full bg-gray-900 border-4 border-gray-700 px-4 py-4 text-white text-xl focus:border-purple-500 focus:outline-none appearance-none cursor-pointer hover:border-gray-600 transition-colors"
+                  style={{borderRadius: '0'}}>
+                  <option value="">Select origin...</option>
+                  {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">▼</div>
+              </div>
+            </div>
+
+            {/* Processing Dropdown */}
+            <div className="space-y-2">
+              <label className="text-purple-400 text-sm uppercase tracking-wider flex items-center gap-2">
+                <span>⚗️</span> PROCESSING
+              </label>
+              <div className="relative">
+                <select 
+                  value={processing} 
+                  onChange={e => setProcessing(e.target.value)}
+                  className="w-full bg-gray-900 border-4 border-gray-700 px-4 py-4 text-white text-xl focus:border-purple-500 focus:outline-none appearance-none cursor-pointer hover:border-gray-600 transition-colors"
+                  style={{borderRadius: '0'}}>
+                  <option value="">Select processing...</option>
+                  {PROCESSING.map(p => <option key={p} value={p}>{p}</option>)}
+                </select>
+                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">▼</div>
+              </div>
+            </div>
+
+            {/* Roast Level */}
+            <div className="space-y-2">
+              <label className="text-purple-400 text-sm uppercase tracking-wider flex items-center gap-2">
+                <span>🔥</span> ROAST LEVEL
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {ROAST_LEVELS.map(level => (
+                  <button
+                    key={level}
+                    onClick={() => setRoast(roast === level ? '' : level)}
+                    className={`py-4 text-lg font-bold border-4 transition-all ${
+                      roast === level 
+                        ? 'bg-purple-600 border-purple-400 text-white' 
+                        : 'bg-gray-900 border-gray-700 text-gray-400 hover:border-gray-600'
+                    }`}
+                    style={{borderRadius: '0'}}>
+                    {level.toUpperCase()}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Continue Button */}
+            <div className="pt-4 space-y-3">
+              <Button onClick={handleContinue} className="w-full py-4 text-xl">
+                FIND RECIPES <ChevronRight className="w-5 h-5" />
+              </Button>
+              <button 
+                onClick={handleSkip}
+                className="w-full text-gray-500 hover:text-gray-300 text-lg py-2 transition-colors">
+                Skip → Show all recipes
+              </button>
+            </div>
+          </div>
+        );
+      };
+
+      // STEP 3: Select Recipe
+      const SelectRecipeView = () => {
+        const recipes = RECIPES[selectedBrewer] || [];
+        const brewer = BREWERS[selectedBrewer];
+        const recommendedIds = getRecommendedRecipes(selectedBrewer, beanProfile);
+        const hasRecommendations = recommendedIds.length > 0;
+
+        // Sort recipes: recommended first
+        const sortedRecipes = [...recipes].sort((a, b) => {
+          const aRec = recommendedIds.includes(a.id);
+          const bRec = recommendedIds.includes(b.id);
+          if (aRec && !bRec) return -1;
+          if (!aRec && bRec) return 1;
+          return 0;
+        });
+
+        return (
+          <div className="space-y-5 pb-24">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setView('beans')} className="text-gray-500 hover:text-white">
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <div className="flex items-center gap-2">
+                <img src={brewer?.image} alt={brewer?.name} className="w-8 h-8 object-contain" />
+                <span className="text-white font-bold text-lg">{brewer?.name}</span>
+              </div>
+            </div>
+
+            {/* Show bean profile summary if set */}
+            {hasRecommendations && (
+              <div className="bg-gray-900/50 border-2 border-orange-500/30 px-4 py-3" style={{borderRadius: '0'}}>
+                <div className="flex items-center gap-2 text-orange-400 text-sm mb-1">
+                  <span>✨</span> MATCHING YOUR BEANS
+                </div>
+                <div className="text-gray-400 text-lg">
+                  {[beanProfile.origin, beanProfile.processing, beanProfile.roast].filter(Boolean).join(' • ')}
+                </div>
+              </div>
+            )}
+
             <h2 className="text-green-400 uppercase tracking-wider mb-3 blink" style={{fontSize: '0.7rem'}}>» CHOOSE RECIPE «</h2>
             
             <div className="space-y-3">
-              {recipes.map((recipe) => (
-                <Card key={recipe.id} onClick={() => { setSelectedRecipe(recipe); setView('brew'); }}
-                  className="bounce-pixel">
-                  <div className="flex justify-between items-start mb-2">
-                    <h3 className="text-purple-300" style={{fontSize: '0.9rem'}}>{recipe.name.toUpperCase()}</h3>
-                    <span className="text-green-400 text-xl">{recipe.coffee}g:{recipe.water}g</span>
-                </div>
-                  
-                  {/* Taste Profile */}
-                  {recipe.taste && (
-                    <p className="text-gray-300 text-xl italic mb-2">{recipe.taste}</p>
-                  )}
-                  
-                  {/* Best For */}
-                  {recipe.bestFor && (
-                    <div className="text-lg text-gray-400 mb-3">
-                      <span className="text-green-400">Try with:</span> {recipe.bestFor}
+              {sortedRecipes.map((recipe) => {
+                const isRecommended = recommendedIds.includes(recipe.id);
+                return (
+                  <div 
+                    key={recipe.id} 
+                    onClick={() => { setSelectedRecipe(recipe); setView('brew'); }}
+                    className={`cursor-pointer ${isRecommended ? 'border-animate' : ''}`}>
+                    <div className={`bg-gray-900 border-4 p-4 transition-all hover:bg-gray-800 active:translate-y-1 ${
+                      isRecommended ? 'border-orange-500' : 'border-gray-700 hover:border-purple-500'
+                    }`} style={{borderRadius: '0'}}>
+                      {isRecommended && (
+                        <div className="flex items-center gap-2 text-orange-400 text-sm mb-2">
+                          <span>⭐</span> RECOMMENDED FOR YOUR BEANS
+                        </div>
+                      )}
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="text-purple-300" style={{fontSize: '0.9rem'}}>{recipe.name.toUpperCase()}</h3>
+                        <span className="text-green-400 text-xl">{recipe.coffee}g:{recipe.water}g</span>
+                      </div>
+                      
+                      {/* Taste Profile */}
+                      {recipe.taste && (
+                        <p className="text-gray-300 text-xl italic mb-2">{recipe.taste}</p>
+                      )}
+                      
+                      {/* Best For */}
+                      {recipe.bestFor && (
+                        <div className="text-lg text-gray-400 mb-3">
+                          <span className="text-green-400">Try with:</span> {recipe.bestFor}
+                        </div>
+                      )}
+                      
+                      <div className="flex justify-between items-center text-gray-500 text-lg border-t border-gray-700 pt-3 mt-2">
+                        <div className="flex gap-3">
+                          <span>{recipe.grind}</span>
+                          <span>•</span>
+                          <span>{recipe.temp}°C / {cToF(recipe.temp)}°F</span>
+                        </div>
+                        {recipe.source && (
+                          <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
+                            className="flex items-center gap-1 text-purple-400 hover:text-purple-300"
+                            onClick={(e) => e.stopPropagation()}>
+                            <ExternalLink className="w-4 h-4" />
+                          </a>
+                        )}
+                      </div>
                     </div>
-                  )}
-                  
-                  <div className="flex justify-between items-center text-gray-500 text-lg border-t border-gray-700 pt-3 mt-2">
-                    <div className="flex gap-3">
-                      <span>{recipe.grind}</span>
-                      <span>•</span>
-                      <span>{recipe.temp}°C / {cToF(recipe.temp)}°F</span>
-                    </div>
-                    {recipe.source && (
-                      <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
-                        className="flex items-center gap-1 text-purple-400 hover:text-purple-300"
-                        onClick={(e) => e.stopPropagation()}>
-                        <ExternalLink className="w-4 h-4" />
-                      </a>
-                    )}
-                </div>
-          </Card>
-              ))}
+                  </div>
+                );
+              })}
             </div>
-        </div>
-      );
+          </div>
+        );
       };
 
       // STEP 3: Brew Session with Visual Tracker
@@ -1050,8 +1234,8 @@
         <div className="min-h-screen bg-black text-gray-100 scanlines">
           {/* Bottom Nav */}
           <nav className="fixed bottom-0 left-0 right-0 bg-gray-900 border-t-4 border-purple-500 px-8 py-3 flex justify-around z-50 pb-safe">
-<button onClick={() => { setView('select'); setSelectedBrewer(null); setSelectedRecipe(null); }}
-              className={`flex flex-col items-center gap-1 px-4 py-1 border-2 ${['select','recipe','brew','log'].includes(view) ? 'text-green-400 border-green-400 bg-green-400/10' : 'text-gray-500 border-transparent'}`}
+<button onClick={() => { setView('select'); setSelectedBrewer(null); setSelectedRecipe(null); setBeanProfile({ origin: '', processing: '', roast: '' }); }}
+              className={`flex flex-col items-center gap-1 px-4 py-1 border-2 ${['select','beans','recipe','brew','log'].includes(view) ? 'text-green-400 border-green-400 bg-green-400/10' : 'text-gray-500 border-transparent'}`}
               style={{borderRadius: '0'}}>
               <Coffee className="w-5 h-5" />
               <span style={{fontSize: '0.65rem'}}>BREW</span>
@@ -1066,6 +1250,7 @@
 
           <main className="px-4 py-5 max-w-md mx-auto">
             {view === 'select' && <SelectBrewerView />}
+            {view === 'beans' && <BeanProfileView />}
             {view === 'recipe' && <SelectRecipeView />}
             {view === 'brew' && <BrewSessionView />}
             {view === 'log' && <LogBrewView />}
