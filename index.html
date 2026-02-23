@@ -785,9 +785,10 @@
 
             {!user ? (
               <div className="text-center py-20">
-                <div className="text-4xl mb-4">🔐</div>
-                <p className="text-gray-400 mb-4 text-lg">SIGN IN TO SAVE</p>
-                <Button onClick={signInWithGoogle}><LogIn className="w-4 h-4" /> GOOGLE LOGIN</Button>
+                <div className="text-6xl mb-6">☕</div>
+                <p className="text-purple-300 mb-2 text-xl">TRACK YOUR BREWS</p>
+                <p className="text-gray-500 mb-8 text-lg">Sign in to save your coffee journal</p>
+                <Button onClick={signInWithGoogle}><LogIn className="w-4 h-4" /> SIGN IN WITH GOOGLE</Button>
               </div>
             ) : logsLoading ? (
               <div className="text-center py-20"><Loader className="w-8 h-8 text-gray-500 animate-spin mx-auto" /></div>
