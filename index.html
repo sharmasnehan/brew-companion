@@ -681,7 +681,7 @@
             </div>
 
             {/* Visual Step Tracker */}
-            <div className="flex items-center gap-1 py-4 overflow-x-auto">
+            <div className="flex items-start gap-1 py-4 overflow-x-auto">
               {steps.map((s, i) => (
                 <React.Fragment key={i}>
                   <div className={`flex flex-col items-center min-w-[60px] ${i <= currentStep ? 'opacity-100' : 'opacity-40'}`}>
@@ -689,16 +689,16 @@
                       ${i < currentStep ? 'bg-green-500 text-black border-green-300' : i === currentStep ? 'bg-purple-500 text-white border-purple-300 blink' : 'bg-gray-800 text-gray-500 border-gray-600'}`}
                       style={{borderRadius: '0'}}>
                       {i < currentStep ? <Check className="w-4 h-4" /> : i + 1}
-                </div>
+                    </div>
                     <span className="text-xs text-center text-gray-400 leading-tight">{s.name}</span>
                     {s.water > 0 && <span className="text-xs text-green-400 font-mono">{s.water}g</span>}
-              </div>
+                  </div>
                   {i < steps.length - 1 && (
-                    <div className={`h-1 w-6 ${i < currentStep ? 'bg-green-400' : 'bg-gray-700'}`} />
+                    <div className={`h-1 w-6 mt-3.5 ${i < currentStep ? 'bg-green-400' : 'bg-gray-700'}`} />
                   )}
                 </React.Fragment>
               ))}
-                 </div>
+            </div>
                  
             {/* Current Step Card */}
             <Card className="!p-6 border-purple-500/30">
