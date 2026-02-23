@@ -720,11 +720,13 @@
                 <p className="text-gray-300 text-2xl mt-2">{step?.instruction}</p>
                 
                 {step?.water > 0 && (
-                  <div className="inline-block bg-purple-500/20 px-6 py-3 rounded-xl border border-purple-500/30">
-                    <div className="text-green-400 text-3xl font-bold font-mono">{step.water}g</div>
-                    <div className="text-purple-400/70 text-xs uppercase">Target</div>
-                   </div>
-                 )}
+                  <div className="inline-block bg-purple-500/20 px-8 py-3 border border-purple-500/30" style={{transform: 'skewX(-10deg)'}}>
+                    <div style={{transform: 'skewX(10deg)'}}>
+                      <div className="text-green-400 text-3xl font-bold font-mono">{step.water}g</div>
+                      <div className="text-purple-400/70 text-xs uppercase">Target</div>
+                    </div>
+                  </div>
+                )}
 
                 {/* Progress bar - only show for timed steps */}
                 {step?.duration > 0 && (
