@@ -69,11 +69,11 @@
 
     // BREWERS AND RECIPES
     const BREWERS = {
-      hario_switch: { name: 'Hario Switch', icon: '🫖' },
-      v60: { name: 'Hario V60', icon: '⌵' },
-      aeropress: { name: 'AeroPress', icon: '💨' },
-      chemex: { name: 'Chemex', icon: '⧖' },
-      espresso: { name: 'Espresso', icon: '☕' }
+      hario_switch: { name: 'Hario Switch', image: 'images/hario-switch.png' },
+      v60: { name: 'Hario V60', image: 'images/hario-v60.png' },
+      aeropress: { name: 'AeroPress', image: 'images/aeropress.png' },
+      chemex: { name: 'Chemex', image: 'images/chemex.png' },
+      espresso: { name: 'Espresso', image: 'images/espresso.png' }
     };
 
     const RECIPES = {
@@ -321,8 +321,8 @@
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(BREWERS).map(([key, brewer]) => (
                 <Card key={key} onClick={() => { setSelectedBrewer(key); setView('recipe'); }} 
-                  className="flex flex-col items-center py-6 hover:bg-gray-800/50">
-                  <span className="text-3xl mb-2">{brewer.icon}</span>
+                  className="flex flex-col items-center py-4 hover:bg-gray-800/50">
+                  <img src={brewer.image} alt={brewer.name} className="w-16 h-16 object-contain mb-2" />
                   <span className="text-white font-semibold text-sm">{brewer.name}</span>
                 </Card>
               ))}
@@ -342,8 +342,8 @@
               <button onClick={() => setView('select')} className="text-gray-500 hover:text-white">
                 <ChevronLeft className="w-6 h-6" />
               </button>
-              <div>
-                <span className="text-purple-400 text-2xl mr-2">{brewer?.icon}</span>
+              <div className="flex items-center gap-2">
+                <img src={brewer?.image} alt={brewer?.name} className="w-8 h-8 object-contain" />
                 <span className="text-white font-bold text-lg">{brewer?.name}</span>
               </div>
             </div>
