@@ -12,49 +12,15 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700;0,9..144,800;0,9..144,900;1,9..144,400&family=Nunito:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;0,9..144,700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-    :root {
-      --font-display: 'Fraunces', serif;
-      --font-body: 'Nunito', sans-serif;
-      --text-lg: 1.75rem;   /* 28px - titles, timer */
-      --text-md: 1rem;      /* 16px - body, values, section heads */
-      --text-sm: 0.75rem;   /* 12px - labels, captions */
-    }
-    
-    * { font-family: var(--font-body); }
+    * { font-family: 'Nunito', sans-serif; }
     body { -webkit-font-smoothing: antialiased; }
-    h1, h2, h3 { font-family: var(--font-display); font-weight: 600; }
-    
-    .text-lg { font-size: var(--text-lg); }
-    .text-md { font-size: var(--text-md); }
-    .text-sm { font-size: var(--text-sm); }
-    
     .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0); }
-    
-    /* Hide number input spinners */
     input[type="number"]::-webkit-inner-spin-button,
-    input[type="number"]::-webkit-outer-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
-    input[type="number"] {
-      -moz-appearance: textfield;
-    }
+    input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    input[type="number"] { -moz-appearance: textfield; }
   </style>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            'display': ['Fraunces', 'serif'],
-            'body': ['Nunito', 'sans-serif'],
-            'mono': ['Space Mono', 'monospace'],
-          }
-        }
-      }
-    }
-  </script>
 </head>
 <body>
   <div id="root"></div>
@@ -66,42 +32,31 @@
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlpaW15b2FiZGdzdWJyYWR0ZWpkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzAwODA5NzQsImV4cCI6MjA4NTY1Njk3NH0.pUWRRIae1GU5u36QcX2JeVR5Qa3JpbSaSUFtHTe2cDU';
     const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // Icon components using Lucide
+    // Icons
     const Icon = ({ name, className = "w-6 h-6", ...props }) => {
       const ref = useRef(null);
       useEffect(() => {
-        if (ref.current && lucide[name]) {
+        if (ref.current && lucide.icons[name]) {
           ref.current.innerHTML = '';
           const icon = lucide.createElement(lucide.icons[name]);
           icon.setAttribute('class', className);
-          Object.entries(props).forEach(([key, value]) => {
-            if (key !== 'fill') icon.setAttribute(key.replace(/([A-Z])/g, '-$1').toLowerCase(), value);
-          });
           if (props.fill) icon.setAttribute('fill', props.fill);
           ref.current.appendChild(icon);
         }
-      }, [name, className, props]);
+      }, [name, className, props.fill]);
       return <span ref={ref} className="inline-flex" />;
     };
 
     const Coffee = (props) => <Icon name="Coffee" {...props} />;
-    const Timer = (props) => <Icon name="Timer" {...props} />;
-    const Settings = (props) => <Icon name="Settings" {...props} />;
-    const Droplets = (props) => <Icon name="Droplets" {...props} />;
-    const Thermometer = (props) => <Icon name="Thermometer" {...props} />;
-    const History = (props) => <Icon name="History" {...props} />;
     const Play = (props) => <Icon name="Play" {...props} />;
     const Pause = (props) => <Icon name="Pause" {...props} />;
     const RotateCcw = (props) => <Icon name="RotateCcw" {...props} />;
-    const CheckCircle = (props) => <Icon name="CheckCircle" {...props} />;
+    const Check = (props) => <Icon name="Check" {...props} />;
     const ChevronRight = (props) => <Icon name="ChevronRight" {...props} />;
     const ChevronLeft = (props) => <Icon name="ChevronLeft" {...props} />;
-    const Flame = (props) => <Icon name="Flame" {...props} />;
-    const Scale = (props) => <Icon name="Scale" {...props} />;
-    const Save = (props) => <Icon name="Save" {...props} />;
     const Star = (props) => <Icon name="Star" {...props} />;
+    const History = (props) => <Icon name="History" {...props} />;
     const LogIn = (props) => <Icon name="LogIn" {...props} />;
-    const LogOut = (props) => <Icon name="LogOut" {...props} />;
     const User = (props) => <Icon name="User" {...props} />;
     const Loader = (props) => <Icon name="Loader" {...props} />;
     const Plus = (props) => <Icon name="Plus" {...props} />;
@@ -109,1096 +64,731 @@
     const Trash = (props) => <Icon name="Trash2" {...props} />;
     const Edit = (props) => <Icon name="Pencil" {...props} />;
 
-    const COUNTRIES = [
-      'Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 
-      'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 
-      'Nepal', 'India', 'Other'
-    ];
+    const COUNTRIES = ['Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 'Nepal', 'India', 'Other'];
+    const VARIETALS = ['Heirloom', 'Bourbon', 'Typica', 'Caturra', 'Catuai', 'Geisha', 'SL-28', 'SL-34', 'Pacamara', 'Castillo', 'Blend', 'Other'];
 
-    const VARIETALS = [
-      'Heirloom', 'Bourbon', 'Typica', 'Caturra', 'Catuai', 
-      'Geisha', 'SL-28', 'SL-34', 'Pacamara', 'Castillo', 'Blend', 'Other'
-    ];
-
-    const METHODS = {
-      v60: {
-        name: 'Hario V60',
-        defaultRatio: 16,
-        description: 'The gold standard for pour-over. Bright and clean.',
-        baseGrind: 'Medium-Fine',
-        totalTime: 180
-      },
-      v60_switch: {
-        name: 'V60 Switch',
-        defaultRatio: 15,
-        description: 'Hybrid immersion/percolation. Excellent body and sweetness.',
-        baseGrind: 'Medium',
-        totalTime: 240
-      },
-      chemex: {
-        name: 'Chemex',
-        defaultRatio: 15,
-        description: 'Iconic design. Clean, bright cup with thick filter.',
-        baseGrind: 'Medium-Coarse',
-        totalTime: 240
-      },
-      kalita: {
-        name: 'Kalita Wave',
-        defaultRatio: 16,
-        description: 'Flat-bottom dripper. Consistent and forgiving.',
-        baseGrind: 'Medium',
-        totalTime: 180
-      },
-      origami: {
-        name: 'Origami',
-        defaultRatio: 16,
-        description: 'Versatile dripper. Rapid flow rate for clarity.',
-        baseGrind: 'Medium-Fine',
-        totalTime: 165
-      },
-      aeropress: {
-        name: 'AeroPress',
-        defaultRatio: 13,
-        description: 'Fast, pressurized brew. Rich and concentrated.',
-        baseGrind: 'Fine',
-        totalTime: 120
-      },
-      espresso: {
-        name: 'Espresso',
-        defaultRatio: 2,
-        description: 'Pressurized extraction. Intense and concentrated.',
-        baseGrind: 'Fine',
-        totalTime: 30
-      }
+    // BREWERS AND RECIPES
+    const BREWERS = {
+      hario_switch: { name: 'Hario Switch', icon: '🫖' },
+      v60: { name: 'Hario V60', icon: '⌵' },
+      aeropress: { name: 'AeroPress', icon: '💨' },
+      chemex: { name: 'Chemex', icon: '⧖' },
+      espresso: { name: 'Espresso', icon: '☕' }
     };
 
-    const ROAST_TEMPS = {
-      light: { range: '205°F - 210°F', value: 207, description: 'High temp to extract harder-to-dissolve compounds.' },
-      medium: { range: '199°F - 205°F', value: 201, description: 'Balanced temp for sweetness and acidity.' },
-      dark: { range: '176°F - 185°F', value: 185, description: 'Lower temp to avoid bitterness and astringency.' }
+    const RECIPES = {
+      hario_switch: [
+        {
+          id: 'switch_classic',
+          name: 'Classic (La Cabra)',
+          coffee: 15,
+          water: 250,
+          grind: 'Medium-Coarse',
+          temp: 96,
+          steps: [
+            { name: 'Add Coffee', water: 0, duration: 0, instruction: 'Rinse filter, add 15g coffee with switch CLOSED' },
+            { name: 'Bloom', water: 60, duration: 45, instruction: 'Pour 60g water for bloom' },
+            { name: 'Main Pour', water: 250, duration: 30, instruction: 'OPEN switch, pour remaining 190g' },
+            { name: 'Drawdown', water: 250, duration: 45, instruction: 'Let it drain completely' }
+          ]
+        },
+        {
+          id: 'switch_mugen',
+          name: 'Immersion (Mugen Hack)',
+          coffee: 15,
+          water: 300,
+          grind: 'Medium',
+          temp: 94,
+          steps: [
+            { name: 'First Pour', water: 150, duration: 10, instruction: 'Add 150g water and stir' },
+            { name: 'Steep', water: 150, duration: 60, instruction: 'Wait 60 seconds' },
+            { name: 'Open & Pour', water: 300, duration: 30, instruction: 'OPEN switch, slowly add remaining 150g' },
+            { name: 'Drawdown', water: 300, duration: 140, instruction: 'Let it drain (~4 min total)' }
+          ]
+        }
+      ],
+      v60: [
+        {
+          id: 'v60_balanced',
+          name: 'Balanced (Kaldi\'s)',
+          coffee: 16,
+          water: 256,
+          grind: 'Medium-Fine',
+          temp: 96,
+          steps: [
+            { name: 'Bloom', water: 40, duration: 40, instruction: 'Pour 40g, swirl gently' },
+            { name: 'Main Pour', water: 256, duration: 100, instruction: 'Pour steadily to 256g' },
+            { name: 'Drawdown', water: 256, duration: 40, instruction: 'Total time ~3 min' }
+          ]
+        },
+        {
+          id: 'v60_pulse',
+          name: 'Pulse Pour (5x60g)',
+          coffee: 20,
+          water: 300,
+          grind: 'Medium-Fine',
+          temp: 96,
+          steps: [
+            { name: 'Bloom', water: 60, duration: 45, instruction: 'Pour 60g bloom, swirl' },
+            { name: 'Pour 2', water: 120, duration: 30, instruction: 'Pour to 120g' },
+            { name: 'Pour 3', water: 180, duration: 30, instruction: 'Pour to 180g' },
+            { name: 'Pour 4', water: 240, duration: 30, instruction: 'Pour to 240g' },
+            { name: 'Pour 5', water: 300, duration: 30, instruction: 'Pour to 300g' },
+            { name: 'Drawdown', water: 300, duration: 45, instruction: 'Total time ~4 min' }
+          ]
+        }
+      ],
+      aeropress: [
+        {
+          id: 'aeropress_standard',
+          name: 'Standard',
+          coffee: 16,
+          water: 200,
+          grind: 'Medium-Fine',
+          temp: 85,
+          steps: [
+            { name: 'Add Water', water: 200, duration: 10, instruction: 'Add all 200g water' },
+            { name: 'Stir', water: 200, duration: 10, instruction: 'Stir 3 times' },
+            { name: 'Steep', water: 200, duration: 40, instruction: 'Wait' },
+            { name: 'Press', water: 200, duration: 30, instruction: 'Press gently for 30s' }
+          ]
+        },
+        {
+          id: 'aeropress_championship',
+          name: 'Championship Style',
+          coffee: 18,
+          water: 100,
+          grind: 'Fine',
+          temp: 80,
+          bypass: 100,
+          steps: [
+            { name: 'Add Water', water: 100, duration: 10, instruction: 'Add 100g water' },
+            { name: 'Stir', water: 100, duration: 10, instruction: 'Stir gently' },
+            { name: 'Press', water: 100, duration: 30, instruction: 'Press after 25-50s' },
+            { name: 'Bypass', water: 100, duration: 10, instruction: 'Add 100g hot water to cup' }
+          ]
+        }
+      ],
+      chemex: [
+        {
+          id: 'chemex_howell',
+          name: 'George Howell (2 cups)',
+          coffee: 32,
+          water: 500,
+          grind: 'Medium-Coarse',
+          temp: 96,
+          steps: [
+            { name: 'Bloom', water: 65, duration: 45, instruction: 'Pour 65g, let bloom' },
+            { name: 'Pour 1', water: 250, duration: 60, instruction: 'Pour slowly to 250g' },
+            { name: 'Pour 2', water: 400, duration: 60, instruction: 'Pour to 400g' },
+            { name: 'Pour 3', water: 500, duration: 60, instruction: 'Pour to 500g' },
+            { name: 'Drawdown', water: 500, duration: 75, instruction: 'Total ~5 min' }
+          ]
+        },
+        {
+          id: 'chemex_madcap',
+          name: 'Madcap',
+          coffee: 42,
+          water: 680,
+          grind: 'Medium-Coarse',
+          temp: 96,
+          steps: [
+            { name: 'Bloom', water: 80, duration: 45, instruction: 'Pour 80g bloom' },
+            { name: 'Pour 1', water: 280, duration: 60, instruction: 'Pour to 280g' },
+            { name: 'Pour 2', water: 480, duration: 60, instruction: 'Pour to 480g' },
+            { name: 'Pour 3', water: 680, duration: 60, instruction: 'Pour to 680g' },
+            { name: 'Drawdown', water: 680, duration: 135, instruction: 'Total 6-7 min' }
+          ]
+        }
+      ],
+      espresso: [
+        {
+          id: 'espresso_classic',
+          name: 'Classic 1:2',
+          coffee: 18,
+          water: 36,
+          grind: 'Fine',
+          temp: 93,
+          steps: [
+            { name: 'Extract', water: 36, duration: 28, instruction: '18g in → 36g out in 25-30s' }
+          ]
+        },
+        {
+          id: 'espresso_ristretto',
+          name: 'Ristretto 1:1.4',
+          coffee: 18,
+          water: 25,
+          grind: 'Fine',
+          temp: 93,
+          steps: [
+            { name: 'Extract', water: 25, duration: 23, instruction: '18g in → 25g out in 20-25s' }
+          ]
+        }
+      ]
     };
 
     const Button = ({ children, onClick, variant = 'primary', className = '', disabled = false }) => {
-      const baseStyles = "px-4 py-2 rounded-lg font-semibold transition-all duration-200 flex items-center justify-center gap-2 active:scale-95";
       const variants = {
-        primary: "bg-gradient-to-r from-purple-600 to-purple-500 text-white hover:from-purple-500 hover:to-purple-400 shadow-lg shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed",
-        secondary: "bg-gray-800 text-gray-200 hover:bg-gray-700 border border-gray-700 disabled:opacity-50",
-        outline: "border-2 border-purple-500/50 text-purple-400 hover:border-purple-400 hover:text-purple-300",
+        primary: "bg-gradient-to-r from-amber-600 to-amber-500 text-white hover:from-amber-500 hover:to-amber-400 shadow-lg shadow-amber-500/25",
+        secondary: "bg-gray-800 text-gray-200 hover:bg-gray-700 border border-gray-700",
         ghost: "text-gray-400 hover:bg-gray-800 hover:text-gray-200",
         danger: "bg-red-500/20 text-red-400 hover:bg-red-500/30 border border-red-500/30"
       };
-      
       return (
-        <button 
-          onClick={onClick} 
-          disabled={disabled}
-          className={`${baseStyles} ${variants[variant]} ${className}`}
-          style={{fontSize: '0.875rem'}}
-        >
+        <button onClick={onClick} disabled={disabled}
+          className={`px-4 py-2 rounded-xl font-semibold transition-all flex items-center justify-center gap-2 active:scale-95 disabled:opacity-50 ${variants[variant]} ${className}`}>
           {children}
         </button>
       );
     };
 
-    const Card = ({ children, className = '' }) => (
-      <div className={`bg-gray-900/80 rounded-xl border border-purple-500/20 p-4 backdrop-blur-sm ${className}`}>
+    const Card = ({ children, className = '', onClick, selected }) => (
+      <div onClick={onClick} 
+        className={`bg-gray-900/80 rounded-2xl border p-4 backdrop-blur-sm transition-all ${selected ? 'border-amber-500 ring-2 ring-amber-500/30' : 'border-gray-800'} ${onClick ? 'cursor-pointer hover:border-gray-700' : ''} ${className}`}>
         {children}
       </div>
     );
 
     function App() {
-      const [method, setMethod] = useState('v60');
-      const [roast, setRoast] = useState('medium');
-      const [origin, setOrigin] = useState('Ethiopia');
-      const [varietal, setVarietal] = useState('Heirloom');
-      const [coffeeAmount, setCoffeeAmount] = useState(20); 
-      const [ratio, setRatio] = useState(16); 
-      const [waterTemp, setWaterTemp] = useState(94);
-      const [roastDate, setRoastDate] = useState('');
-      const [roasterName, setRoasterName] = useState('');
-      const [view, setView] = useState('config');
+      const [view, setView] = useState('select'); // select, recipe, brew, log, history
+      const [selectedBrewer, setSelectedBrewer] = useState(null);
+      const [selectedRecipe, setSelectedRecipe] = useState(null);
       const [logs, setLogs] = useState([]);
-      
-      // Auth state
       const [user, setUser] = useState(null);
       const [authLoading, setAuthLoading] = useState(true);
       const [logsLoading, setLogsLoading] = useState(false);
 
-      // Auth listener
+      // Auth
       useEffect(() => {
         supabase.auth.getSession().then(({ data: { session } }) => {
           setUser(session?.user ?? null);
           setAuthLoading(false);
         });
-
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
           setUser(session?.user ?? null);
         });
-
         return () => subscription.unsubscribe();
       }, []);
 
-      // Load logs when user changes
       useEffect(() => {
-        if (user) {
-          loadLogs();
-        } else {
-          setLogs([]);
-        }
+        if (user) loadLogs();
+        else setLogs([]);
       }, [user]);
 
       const loadLogs = async () => {
         setLogsLoading(true);
-        const { data, error } = await supabase
-          .from('brew_logs')
-          .select('*')
-          .order('created_at', { ascending: false });
-        
-        if (error) {
-          console.error('Error loading logs:', error);
-        } else {
+        const { data, error } = await supabase.from('brew_logs').select('*').order('created_at', { ascending: false });
+        if (!error) {
           setLogs(data.map(log => ({
-            id: log.id,
-            date: new Date(log.created_at).toLocaleDateString(),
-            brewDate: log.brew_date,
-            roastDate: log.roast_date,
-            roaster: log.roaster,
-            origin: log.origin,
-            varietal: log.varietal,
-            method: log.method,
-            roast: log.roast,
-            rating: log.rating,
-            notes: log.notes,
-            coffeeAmount: log.coffee_amount,
-            ratio: log.ratio
+            id: log.id, date: new Date(log.created_at).toLocaleDateString(),
+            beanName: log.roaster, origin: log.origin, varietal: log.varietal,
+            roast: log.roast, roastDate: log.roast_date, method: log.method,
+            recipe: log.notes?.split('|')[0]?.trim(), coffee: log.coffee_amount,
+            rating: log.rating, notes: log.notes
           })));
         }
         setLogsLoading(false);
       };
 
-      const deleteLog = async (id) => {
-        if (!confirm('Delete this entry?')) return;
-        const { error } = await supabase.from('brew_logs').delete().eq('id', id);
-        if (error) {
-          alert('Failed to delete: ' + error.message);
-        } else {
-          await loadLogs();
-        }
-      };
-
-      const saveLog = async (rating, notes) => {
-        const { error } = await supabase.from('brew_logs').insert({
-          user_id: user.id,
-          origin,
-          varietal,
-          method,
-          roast,
-          roaster: roasterName || null,
-          coffee_amount: coffeeAmount,
-          ratio,
-          rating,
-          notes,
-          brew_date: new Date().toISOString().split('T')[0],
-          roast_date: roastDate || null
-        });
-
-        if (error) {
-          console.error('Error saving log:', error);
-          alert('Failed to save log. Please try again.');
-        } else {
-          await loadLogs();
-        }
-      };
-
       const signInWithGoogle = async () => {
-        const { error } = await supabase.auth.signInWithOAuth({
+        await supabase.auth.signInWithOAuth({
           provider: 'google',
-          options: {
-            redirectTo: window.location.origin + window.location.pathname
-          }
+          options: { redirectTo: window.location.origin + window.location.pathname }
         });
-        if (error) console.error('Error signing in:', error);
       };
 
-      const signOut = async () => {
-        const { error } = await supabase.auth.signOut();
-        if (error) console.error('Error signing out:', error);
-      };
+      const signOut = () => supabase.auth.signOut();
 
-      const waterAmount = Math.round((coffeeAmount || 0) * (ratio || 0));
-      const currentMethod = METHODS[method];
-
-      const getDynamicGrind = () => {
-        const base = currentMethod.baseGrind;
-        const finerVarietals = ['Geisha', 'Heirloom', 'SL-28', 'SL-34'];
-        const coarserVarietals = ['Blend', 'Other'];
-
-        if (finerVarietals.includes(varietal)) {
-          if (base === 'Medium') return 'Medium-Fine (adjusted for varietal)';
-          if (base === 'Medium-Fine') return 'Fine-Medium (adjusted for varietal)';
-        }
-        
-        if (coarserVarietals.includes(varietal)) {
-           if (base === 'Medium-Fine') return 'Medium (adjusted for varietal)';
-           if (base === 'Fine') return 'Medium-Fine (adjusted for varietal)';
-        }
-
-        return base;
-      };
-
-      const getBrewPrediction = () => {
-        const isHighRatio = ratio >= 17;
-        const isLowRatio = ratio <= 14;
-        const isHotTemp = waterTemp >= 205;
-        const isCoolTemp = waterTemp <= 185;
-        
-        let body = 'medium';
-        let acidity = 'balanced';
-        let flavor = '';
-        
-        // Ratio effects
-        if (isLowRatio) {
-          body = 'full';
-          flavor = 'concentrated and bold';
-        } else if (isHighRatio) {
-          body = 'light';
-          flavor = 'delicate and tea-like';
-        } else {
-          flavor = 'well-rounded';
-        }
-        
-        // Temp effects
-        if (isHotTemp) {
-          acidity = 'bright';
-        } else if (isCoolTemp) {
-          acidity = 'mellow';
-        }
-        
-        // Method effects
-        let methodNote = '';
-        if (method === 'aeropress') {
-          methodNote = 'Rich mouthfeel with low bitterness.';
-        } else if (method === 'v60') {
-          methodNote = 'Clean cup with clarity.';
-        } else if (method === 'v60_switch') {
-          methodNote = 'Balanced sweetness with body.';
-        } else if (method === 'origami') {
-          methodNote = 'Crisp and vibrant extraction.';
-        }
-        
-        // Roast effects
-        let roastNote = '';
-        if (roast === 'light') {
-          roastNote = 'Expect floral and fruity notes.';
-        } else if (roast === 'medium') {
-          roastNote = 'Expect caramel and nutty notes.';
-        } else {
-          roastNote = 'Expect chocolate and smoky notes.';
-        }
-        
-        return `${body.charAt(0).toUpperCase() + body.slice(1)} body, ${acidity} acidity, ${flavor}. ${methodNote} ${roastNote}`;
-      };
-
-      const generateSteps = () => {
-        const bloomWater = coffeeAmount * 2.5;
-        
-        switch (method) {
-          case 'v60':
-          case 'origami':
-          case 'kalita':
-            return [
-              { name: 'Bloom', description: 'Pour just enough water to wet grounds. Swirl gently.', duration: 45, waterTarget: Math.round(bloomWater) },
-              { name: 'Main Pour', description: 'Pour remaining water in slow spirals.', duration: 45, waterTarget: waterAmount },
-              { name: 'Drawdown', description: 'Gently swirl and tap. Wait for total drain.', duration: currentMethod.totalTime - 90, waterTarget: waterAmount }
-            ];
-          case 'chemex':
-            return [
-              { name: 'Bloom', description: 'Pour just enough water to wet grounds. Wait.', duration: 45, waterTarget: Math.round(bloomWater) },
-              { name: 'First Pour', description: 'Pour slowly in circles to halfway.', duration: 60, waterTarget: Math.round(waterAmount * 0.6) },
-              { name: 'Second Pour', description: 'Continue pouring to target weight.', duration: 60, waterTarget: waterAmount },
-              { name: 'Drawdown', description: 'Let it drain completely.', duration: 75, waterTarget: waterAmount }
-            ];
-          case 'v60_switch':
-            return [
-              { name: 'Bloom (Open)', description: 'Switch open. Wet grounds for degassing.', duration: 30, waterTarget: Math.round(bloomWater) },
-              { name: 'Immersion Phase', description: 'Close switch. Pour all remaining water.', duration: 150, waterTarget: waterAmount },
-              { name: 'Release', description: 'Open switch to let coffee drain.', duration: 60, waterTarget: waterAmount }
-            ];
-          case 'aeropress':
-            return [
-              { name: 'Initial Pour', description: 'Add all water rapidly.', duration: 15, waterTarget: waterAmount },
-              { name: 'Stir & Seal', description: 'Stir 3 times, insert plunger to create vacuum.', duration: 75, waterTarget: waterAmount },
-              { name: 'Plunge', description: 'Press down gently (30s) until you hear the hiss.', duration: 30, waterTarget: waterAmount }
-            ];
-          default:
-            return [];
-        }
-      };
-
-      const steps = generateSteps();
-
-      const configView = (
-        <div className="space-y-4 pb-6">
-          <div className="flex items-center justify-center mb-5 relative">
+      // STEP 1: Select Brewer
+      const SelectBrewerView = () => (
+        <div className="space-y-6 pb-24">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Coffee className="w-7 h-7 text-purple-400" />
-              <h1 className="text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.5rem'}}>
-                Brew Buddy
-              </h1>
+              <Coffee className="w-8 h-8 text-amber-500" />
+              <h1 className="text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.75rem'}}>Brew Buddy</h1>
             </div>
-            <div className="absolute right-0">
-              {authLoading ? (
-                <div className="w-10 h-10 flex items-center justify-center">
-                  <Loader className="w-5 h-5 text-gray-500 animate-spin" />
-                </div>
-              ) : user ? (
-                <button 
-                  onClick={signOut}
-                  className="w-10 h-10 rounded-full bg-purple-500/20 border border-purple-500/30 flex items-center justify-center hover:bg-purple-500/30 transition-colors"
-                  title={`Signed in as ${user.email}`}
-                >
-                  {user.user_metadata?.avatar_url ? (
-                    <img src={user.user_metadata.avatar_url} alt="" className="w-8 h-8 rounded-full" />
-                  ) : (
-                    <User className="w-5 h-5 text-purple-400" />
-                  )}
-                </button>
-              ) : (
-                <button 
-                  onClick={signInWithGoogle}
-                  className="px-3 py-1.5 rounded-lg bg-green-500/20 border border-green-500/30 hover:bg-green-500/30 transition-colors"
-                >
-                  <span className="text-green-400 font-semibold" style={{fontSize: '0.8rem'}}>Login</span>
-                </button>
-              )}
-            </div>
+            {authLoading ? <Loader className="w-5 h-5 text-gray-500 animate-spin" /> : user ? (
+              <button onClick={signOut} className="w-9 h-9 rounded-full overflow-hidden border-2 border-amber-500/50">
+                {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} className="w-full h-full" /> : <User className="w-5 h-5 text-amber-500" />}
+              </button>
+            ) : (
+              <button onClick={signInWithGoogle} className="px-3 py-1.5 rounded-lg bg-amber-500/20 border border-amber-500/30 text-amber-400 font-semibold text-sm">Login</button>
+            )}
           </div>
 
-          <Card>
-            <h2 className="font-semibold text-white mb-3 flex items-center gap-2" style={{fontFamily: "'Fraunces', serif", fontSize: '0.9rem'}}>
-              <Droplets className="w-4 h-4 text-green-400" />
-              Equipment & Beans
-            </h2>
-            
-            <div className="space-y-4">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Brew Method</label>
-                  <select
-                    value={method}
-                    onChange={(e) => {
-                      setMethod(e.target.value);
-                      setRatio(METHODS[e.target.value].defaultRatio);
-                    }}
-                    className="w-full border border-gray-700 rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
-                    style={{fontSize: '0.875rem'}}
-                  >
-                    {Object.entries(METHODS).map(([key, m]) => (
-                      <option key={key} value={key}>{m.name}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roaster / Name</label>
-                  <input 
-                    type="text" 
-                    value={roasterName}
-                    onChange={(e) => setRoasterName(e.target.value)}
-                    placeholder="e.g. Blue Bottle"
-                    className="w-full border border-gray-700 rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
-                    style={{fontSize: '0.875rem'}}
-                  />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Origin</label>
-                  <select
-                    value={origin}
-                    onChange={(e) => setOrigin(e.target.value)}
-                    className="w-full border border-gray-700 rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
-                    style={{fontSize: '0.875rem'}}
-                  >
-                    {COUNTRIES.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Varietal</label>
-                  <select
-                    value={varietal}
-                    onChange={(e) => setVarietal(e.target.value)}
-                    className="w-full border border-gray-700 rounded-lg px-2 py-2 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
-                    style={{fontSize: '0.875rem'}}
-                  >
-                    {VARIETALS.map((v) => (
-                      <option key={v} value={v}>{v}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-               <div className="grid grid-cols-2 gap-3 overflow-hidden">
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roast Level</label>
-                  <div className="flex bg-gray-800 p-0.5 rounded-lg border border-gray-700">
-                    {['light', 'medium', 'dark'].map((r) => (
-                      <button
-                        key={r}
-                        onClick={() => {
-                          setRoast(r);
-                          setWaterTemp(ROAST_TEMPS[r].value);
-                        }}
-                        className={`flex-1 py-1.5 font-semibold rounded-md capitalize transition-all ${
-                          roast === r ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'
-                        }`}
-                        style={{fontSize: '0.7rem'}}
-                      >
-                        {r}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roast Date</label>
-                  <input 
-                    type="date" 
-                    value={roastDate}
-                    onChange={(e) => setRoastDate(e.target.value)}
-                    className="w-full max-w-full box-border border border-gray-700 rounded-lg px-2 py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-medium text-gray-200"
-                    style={{fontSize: '0.8rem', colorScheme: 'dark'}}
-                  />
-                </div>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
-            <h2 className="font-semibold text-white mb-3 flex items-center gap-2" style={{fontFamily: "'Fraunces', serif", fontSize: '0.9rem'}}>
-              <Scale className="w-4 h-4 text-green-400" />
-              Recipe Parameters
-            </h2>
-
+          <div>
+            <h2 className="text-gray-400 font-semibold uppercase tracking-wider text-xs mb-3">Choose Your Brewer</h2>
             <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Coffee (g)</label>
-                  <input 
-                    type="number" 
-                    min="1" 
-                    max="100" 
-                    value={coffeeAmount} 
-                    onChange={(e) => setCoffeeAmount(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full border border-gray-700 rounded-lg py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-bold text-green-400 text-center appearance-none"
-                    style={{fontSize: '1rem'}}
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Ratio (1:X)</label>
-                  <input 
-                    type="number" 
-                    min="1" 
-                    max="30" 
-                    step="0.5"
-                    value={ratio} 
-                    onChange={(e) => setRatio(e.target.value === '' ? '' : Number(e.target.value))}
-                    className="w-full border border-gray-700 rounded-lg py-1.5 focus:ring-2 focus:ring-purple-500 focus:outline-none bg-gray-800 font-bold text-green-400 text-center appearance-none"
-                    style={{fontSize: '1rem'}}
-                  />
-                </div>
-              </div>
-
-              <div className="bg-gradient-to-br from-purple-500/10 to-green-500/10 rounded-xl p-3 grid grid-cols-3 gap-2 border border-purple-500/20 mt-4">
-                 <div className="text-center p-2">
-                    <Droplets className="w-4 h-4 text-purple-400 mx-auto mb-1" />
-                    <span className="font-bold text-green-400 block" style={{fontSize: '0.875rem'}}>{waterAmount}ml</span>
-                    <span className="text-gray-500 font-semibold uppercase tracking-wider" style={{fontSize: '0.6rem'}}>Water</span>
-                 </div>
-                 <div className="text-center p-2 border-x border-purple-500/20">
-                    <Thermometer className="w-4 h-4 text-purple-400 mx-auto mb-1" />
-                    <span className="font-bold text-green-400 block" style={{fontSize: '0.875rem'}}>{waterTemp}°F</span>
-                    <span className="text-gray-500 font-semibold uppercase tracking-wider" style={{fontSize: '0.6rem'}}>Temp</span>
-                 </div>
-                 <div className="text-center p-2">
-                    <Settings className="w-4 h-4 text-purple-400 mx-auto mb-1" />
-                    <span className="font-semibold text-gray-200 block leading-tight" style={{fontSize: '0.75rem'}}>
-                      {getDynamicGrind().split(' ')[0]}
-                    </span>
-                    <span className="text-gray-500 font-semibold uppercase tracking-wider" style={{fontSize: '0.6rem'}}>Grind</span>
-                 </div>
-              </div>
-          </Card>
-
-          <div className="bg-gray-900 border border-green-500/30 text-gray-300 p-3 rounded-xl flex gap-3 items-start">
-            <div className="bg-green-500/20 p-1.5 rounded-full shrink-0">
-              <Flame className="w-4 h-4 text-green-400" />
-            </div>
-            <div>
-              <p className="font-semibold text-green-400 mb-0.5" style={{fontFamily: "'Fraunces', serif", fontSize: '0.875rem'}}>Brew Predictor</p>
-              <p className="leading-relaxed text-gray-400" style={{fontSize: '0.7rem'}}>{getBrewPrediction()}</p>
+              {Object.entries(BREWERS).map(([key, brewer]) => (
+                <Card key={key} onClick={() => { setSelectedBrewer(key); setView('recipe'); }} 
+                  className="flex flex-col items-center py-6 hover:bg-gray-800/50">
+                  <span className="text-3xl mb-2">{brewer.icon}</span>
+                  <span className="text-white font-semibold text-sm">{brewer.name}</span>
+                </Card>
+              ))}
             </div>
           </div>
-
-          <Button onClick={() => setView('brew')} className="w-full py-3 shadow-xl active:scale-95">
-            Start Brewing <ChevronRight className="w-4 h-4" />
-          </Button>
         </div>
       );
 
+      // STEP 2: Select Recipe
+      const SelectRecipeView = () => {
+        const recipes = RECIPES[selectedBrewer] || [];
+        const brewer = BREWERS[selectedBrewer];
+
+        return (
+          <div className="space-y-5 pb-24">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setView('select')} className="text-gray-500 hover:text-white">
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <div>
+                <span className="text-amber-500 text-2xl mr-2">{brewer?.icon}</span>
+                <span className="text-white font-bold text-lg">{brewer?.name}</span>
+              </div>
+            </div>
+
+            <h2 className="text-gray-400 font-semibold uppercase tracking-wider text-xs">Select Recipe</h2>
+            
+            <div className="space-y-3">
+              {recipes.map((recipe) => (
+                <Card key={recipe.id} onClick={() => { setSelectedRecipe(recipe); setView('brew'); }}
+                  className="hover:bg-gray-800/50">
+                  <div className="flex justify-between items-start mb-2">
+                    <h3 className="text-white font-bold">{recipe.name}</h3>
+                    <span className="text-amber-400 font-mono text-sm">{recipe.coffee}g : {recipe.water}g</span>
+                  </div>
+                  <div className="flex gap-4 text-gray-500 text-xs">
+                    <span>Grind: {recipe.grind}</span>
+                    <span>{recipe.temp}°C</span>
+                  </div>
+                  <div className="flex gap-1 mt-3 overflow-x-auto">
+                    {recipe.steps.map((step, i) => (
+                      <span key={i} className="px-2 py-1 bg-gray-800 rounded text-xs text-gray-400 whitespace-nowrap">
+                        {step.name} {step.water > 0 && `→ ${step.water}g`}
+                      </span>
+                    ))}
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </div>
+        );
+      };
+
+      // STEP 3: Brew Session with Visual Tracker
       const BrewSessionView = () => {
-        const [timeLeft, setTimeLeft] = useState(0);
-        const [isActive, setIsActive] = useState(false);
-        const [stepIndex, setStepIndex] = useState(0);
-        const [isFinished, setIsFinished] = useState(false);
-        const [showSaveModal, setShowSaveModal] = useState(false);
+        const [currentStep, setCurrentStep] = useState(0);
+        const [timeInStep, setTimeInStep] = useState(0);
+        const [totalTime, setTotalTime] = useState(0);
+        const [isRunning, setIsRunning] = useState(false);
+        const [isComplete, setIsComplete] = useState(false);
         const timerRef = useRef(null);
 
-        const currentStep = steps[stepIndex];
-        const stepStartTime = steps.slice(0, stepIndex).reduce((acc, s) => acc + s.duration, 0);
-        const stepTimeElapsed = Math.max(0, timeLeft - stepStartTime);
+        const recipe = selectedRecipe;
+        const steps = recipe?.steps || [];
+        const step = steps[currentStep];
 
         useEffect(() => {
-          if (isActive) {
-            timerRef.current = window.setInterval(() => {
-              setTimeLeft(t => {
-                const nextTime = t + 1;
-                const totalDurationBeforeNext = steps.slice(0, stepIndex + 1).reduce((acc, s) => acc + s.duration, 0);
-                if (nextTime >= totalDurationBeforeNext) {
-                  if (stepIndex < steps.length - 1) {
-                    setStepIndex(prev => prev + 1);
-                  } else {
-                    setIsActive(false);
-                    setIsFinished(true);
-                  }
+          if (isRunning && !isComplete) {
+            timerRef.current = setInterval(() => {
+              setTimeInStep(t => {
+                const newTime = t + 1;
+                if (newTime >= step.duration && currentStep < steps.length - 1) {
+                  setCurrentStep(c => c + 1);
+                  return 0;
+                } else if (newTime >= step.duration && currentStep === steps.length - 1) {
+                  setIsRunning(false);
+                  setIsComplete(true);
                 }
-                return nextTime;
+                return newTime;
               });
+              setTotalTime(t => t + 1);
             }, 1000);
-          } else if (timerRef.current) {
-            clearInterval(timerRef.current);
           }
-          return () => {
-            if (timerRef.current) clearInterval(timerRef.current);
-          };
-        }, [isActive, stepIndex]);
+          return () => clearInterval(timerRef.current);
+        }, [isRunning, currentStep, isComplete]);
 
-        const formatTime = (seconds) => {
-          const mins = Math.floor(seconds / 60);
-          const secs = seconds % 60;
-          return `${mins}:${secs.toString().padStart(2, '0')}`;
-        };
+        const formatTime = (s) => `${Math.floor(s/60)}:${(s%60).toString().padStart(2,'0')}`;
+        const progress = step?.duration > 0 ? (timeInStep / step.duration) * 100 : 0;
 
-        const handleSaveLog = async (rating, notes) => {
-          if (user) {
-            await saveLog(rating, notes);
-          }
-          setView('history');
-        };
-
-        if (showSaveModal) {
+        if (isComplete) {
           return (
-            <SaveLogModal 
-              onSave={handleSaveLog} 
-              onCancel={() => setView('config')} 
-            />
+            <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-6">
+              <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
+                <Check className="w-10 h-10 text-green-400" />
+              </div>
+              <h2 className="text-white text-2xl font-bold" style={{fontFamily: "'Fraunces', serif"}}>Brew Complete!</h2>
+              <p className="text-gray-400">Total time: {formatTime(totalTime)}</p>
+              <Button onClick={() => setView('log')} className="w-full max-w-xs py-3">
+                Log This Brew <ChevronRight className="w-4 h-4" />
+              </Button>
+              <button onClick={() => { setView('select'); setSelectedRecipe(null); setSelectedBrewer(null); }} 
+                className="text-gray-500 hover:text-white text-sm">Skip logging</button>
+            </div>
           );
         }
 
         return (
-          <div className="flex flex-col h-[calc(100vh-5rem)]">
-            <div className="flex items-center justify-between mb-4">
-              <Button variant="ghost" onClick={() => setView('config')} className="!px-2 py-1">
-                <ChevronLeft className="w-5 h-5" /> Back
-              </Button>
+          <div className="space-y-4 pb-24">
+            {/* Header */}
+            <div className="flex items-center justify-between">
+              <button onClick={() => { setView('recipe'); setIsRunning(false); }} className="text-gray-500 hover:text-white">
+                <ChevronLeft className="w-6 h-6" />
+              </button>
               <div className="text-center">
-                <span className="font-semibold tracking-widest text-purple-400 uppercase block mb-1" style={{fontSize: '0.75rem'}}>Session</span>
-                <h2 className="font-semibold text-white capitalize" style={{fontFamily: "'Fraunces', serif", fontSize: '1rem'}}>{method.replace('_', ' ')}</h2>
+                <div className="text-amber-500 font-semibold text-xs uppercase tracking-wider">{BREWERS[selectedBrewer]?.name}</div>
+                <div className="text-white font-bold">{recipe?.name}</div>
               </div>
-              <div className="w-12" />
+              <div className="text-gray-500 font-mono text-sm">{formatTime(totalTime)}</div>
             </div>
 
-            <div className="flex-1 flex flex-col items-center justify-center space-y-6">
-              <div className="relative w-56 h-56 flex items-center justify-center">
-                <svg className="w-full h-full transform -rotate-90" viewBox="0 0 224 224">
-                  <circle cx="112" cy="112" r="104" stroke="currentColor" strokeWidth="6" fill="transparent" className="text-gray-800" />
-                  <circle
-                    cx="112"
-                    cy="112"
-                    r="104"
-                    stroke="url(#gradient)"
-                    strokeWidth="6"
-                    fill="transparent"
-                    strokeDasharray={2 * Math.PI * 104}
-                    strokeDashoffset={2 * Math.PI * 104 * (1 - (stepTimeElapsed / currentStep.duration))}
-                    className="transition-all duration-1000 ease-linear"
-                    strokeLinecap="round"
-                  />
-                  <defs>
-                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                      <stop offset="0%" stopColor="#a855f7" />
-                      <stop offset="100%" stopColor="#22c55e" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center">
-                   <span className="font-bold text-white tabular-nums" style={{fontSize: '2rem'}}>
-                      {formatTime(isActive || isFinished ? timeLeft : 0)}
-                   </span>
-                   <span className="text-gray-500 font-semibold uppercase tracking-widest mt-1" style={{fontSize: '0.65rem'}}>
-                     Elapsed
-                   </span>
+            {/* Visual Step Tracker */}
+            <div className="flex items-center gap-1 py-4 overflow-x-auto">
+              {steps.map((s, i) => (
+                <React.Fragment key={i}>
+                  <div className={`flex flex-col items-center min-w-[60px] ${i <= currentStep ? 'opacity-100' : 'opacity-40'}`}>
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold mb-1
+                      ${i < currentStep ? 'bg-green-500 text-white' : i === currentStep ? 'bg-amber-500 text-white' : 'bg-gray-700 text-gray-400'}`}>
+                      {i < currentStep ? <Check className="w-4 h-4" /> : i + 1}
+                    </div>
+                    <span className="text-xs text-center text-gray-400 leading-tight">{s.name}</span>
+                    {s.water > 0 && <span className="text-xs text-amber-400 font-mono">{s.water}g</span>}
+                  </div>
+                  {i < steps.length - 1 && (
+                    <div className={`h-0.5 w-6 ${i < currentStep ? 'bg-green-500' : 'bg-gray-700'}`} />
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+
+            {/* Current Step Card */}
+            <Card className="!p-6 border-amber-500/30">
+              <div className="text-center space-y-4">
+                <div className="text-amber-500 font-semibold uppercase tracking-wider text-xs">Step {currentStep + 1} of {steps.length}</div>
+                <h3 className="text-white text-2xl font-bold" style={{fontFamily: "'Fraunces', serif"}}>{step?.name}</h3>
+                <p className="text-gray-300 text-lg">{step?.instruction}</p>
+                
+                {step?.water > 0 && (
+                  <div className="inline-block bg-amber-500/20 px-6 py-3 rounded-xl border border-amber-500/30">
+                    <div className="text-amber-400 text-3xl font-bold font-mono">{step.water}g</div>
+                    <div className="text-amber-500/70 text-xs uppercase">Target</div>
+                  </div>
+                )}
+
+                {/* Progress bar */}
+                <div className="w-full bg-gray-800 rounded-full h-2 mt-4">
+                  <div className="bg-amber-500 h-2 rounded-full transition-all duration-1000" style={{width: `${progress}%`}} />
                 </div>
+                <div className="text-gray-500 font-mono text-sm">{formatTime(timeInStep)} / {formatTime(step?.duration || 0)}</div>
               </div>
+            </Card>
 
-              <div className="w-full text-center space-y-4 px-2">
-                 <div className="bg-gradient-to-br from-purple-500/10 to-green-500/5 rounded-xl p-5 border border-purple-500/30">
-                    <h3 className="font-semibold text-purple-300 mb-1" style={{fontFamily: "'Fraunces', serif", fontSize: '1.25rem'}}>{currentStep.name}</h3>
-                    <p className="text-gray-400 mb-4 font-medium leading-relaxed" style={{fontSize: '0.875rem'}}>{currentStep.description}</p>
-                    {currentStep.waterTarget && (
-                      <div className="inline-flex flex-col bg-black/50 px-4 py-2 rounded-lg border border-green-500/30">
-                        <span className="font-semibold text-gray-500 uppercase tracking-wider mb-0.5" style={{fontSize: '0.65rem'}}>Pour Water To</span>
-                        <span className="font-bold text-green-400" style={{fontSize: '1.25rem'}}>{currentStep.waterTarget}g</span>
-                      </div>
-                    )}
-                 </div>
-                 
-                 {isFinished && (
-                   <div className="bg-green-500/20 text-green-400 p-3 rounded-lg flex items-center justify-center gap-2 border border-green-500/30">
-                     <CheckCircle className="w-4 h-4" />
-                     <span className="font-semibold" style={{fontFamily: "'Fraunces', serif", fontSize: '0.875rem'}}>Brew Ready!</span>
-                   </div>
-                 )}
-              </div>
-            </div>
-
-            <div className="mt-auto grid grid-cols-2 gap-3 pb-4">
-              {!isActive && !isFinished ? (
-                <Button onClick={() => setIsActive(true)} className="col-span-2 py-3 shadow-lg">
-                  <Play className="w-5 h-5" fill="currentColor" /> Start Timer
+            {/* Controls */}
+            <div className="grid grid-cols-2 gap-3">
+              {!isRunning ? (
+                <Button onClick={() => setIsRunning(true)} className="col-span-2 py-4">
+                  <Play className="w-5 h-5" fill="currentColor" /> {totalTime > 0 ? 'Resume' : 'Start'}
                 </Button>
-              ) : isFinished ? (
-                <>
-                   <Button onClick={() => setShowSaveModal(true)} variant="primary" className="py-3">
-                     <Save className="w-4 h-4" /> Log
-                   </Button>
-                   <Button onClick={() => setView('config')} variant="secondary" className="py-3">
-                     Reset
-                   </Button>
-                </>
               ) : (
-                 <>
-                    <Button onClick={() => setIsActive(false)} variant="secondary" className="py-3 shadow-md">
-                      <Pause className="w-5 h-5" fill="currentColor" /> Pause
-                    </Button>
-                    <Button onClick={() => {
-                      setIsActive(false);
-                      setTimeLeft(0);
-                      setStepIndex(0);
-                    }} variant="danger" className="py-3 shadow-md">
-                      <RotateCcw className="w-5 h-5" /> Stop
-                    </Button>
-                 </>
+                <>
+                  <Button onClick={() => setIsRunning(false)} variant="secondary" className="py-4">
+                    <Pause className="w-5 h-5" fill="currentColor" /> Pause
+                  </Button>
+                  <Button onClick={() => { setIsRunning(false); setTimeInStep(0); setTotalTime(0); setCurrentStep(0); }} 
+                    variant="danger" className="py-4">
+                    <RotateCcw className="w-5 h-5" /> Reset
+                  </Button>
+                </>
               )}
             </div>
           </div>
         );
       };
 
-      const SaveLogModal = ({ onSave, onCancel }) => {
+      // STEP 4: Log Bean Info
+      const LogBrewView = () => {
+        const [beanName, setBeanName] = useState('');
+        const [origin, setOrigin] = useState('Ethiopia');
+        const [varietal, setVarietal] = useState('Heirloom');
+        const [roast, setRoast] = useState('medium');
+        const [roastDate, setRoastDate] = useState('');
         const [rating, setRating] = useState(0);
         const [notes, setNotes] = useState('');
+        const [saving, setSaving] = useState(false);
 
-        if (!user) {
-          return (
-            <div className="space-y-4 pt-6">
-              <h2 className="font-semibold text-center text-white" style={{fontFamily: "'Fraunces', serif", fontSize: '1.25rem'}}>Save Your Brew</h2>
-              <Card>
-                <div className="text-center py-6">
-                  <LogIn className="w-12 h-12 text-gray-600 mx-auto mb-4" />
-                  <p className="text-gray-400 mb-4" style={{fontSize: '0.9rem'}}>Sign in to save this brew to your journal</p>
-                  <Button onClick={signInWithGoogle} className="mb-3">
-                    <LogIn className="w-4 h-4" /> Sign in with Google
-                  </Button>
-                  <div className="mt-4">
-                    <Button variant="ghost" onClick={onCancel} className="text-gray-500">
-                      Skip for now
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </div>
-          );
-        }
+        const handleSave = async () => {
+          if (!user) { signInWithGoogle(); return; }
+          setSaving(true);
+          const { error } = await supabase.from('brew_logs').insert({
+            user_id: user.id,
+            roaster: beanName,
+            origin, varietal, roast,
+            roast_date: roastDate || null,
+            method: selectedBrewer,
+            coffee_amount: selectedRecipe?.coffee,
+            ratio: selectedRecipe?.water,
+            rating: rating || null,
+            notes: `${selectedRecipe?.name} | ${notes}`.trim()
+          });
+          setSaving(false);
+          if (!error) {
+            await loadLogs();
+            setView('history');
+            setSelectedRecipe(null);
+            setSelectedBrewer(null);
+          } else {
+            alert('Failed to save: ' + error.message);
+          }
+        };
 
         return (
-          <div className="space-y-4 pt-6">
-            <h2 className="font-semibold text-center text-white" style={{fontFamily: "'Fraunces', serif", fontSize: '1.25rem'}}>Rate the Cup</h2>
-            <Card>
-              <div className="flex justify-center gap-2 mb-5">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <button 
-                    key={star}
-                    onClick={() => setRating(star)}
-                    className="focus:outline-none transition-transform hover:scale-110 active:scale-95"
-                  >
-                    <Star 
-                      className={`w-10 h-10 ${star <= rating ? 'text-purple-400' : 'text-gray-700'}`}
-                      fill={star <= rating ? 'currentColor' : 'none'}
-                    />
-                  </button>
-                ))}
+          <div className="space-y-5 pb-24">
+            <div className="flex items-center gap-3">
+              <button onClick={() => setView('brew')} className="text-gray-500 hover:text-white">
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <h2 className="text-white font-bold text-lg">Log Your Beans</h2>
+            </div>
+
+            <Card className="space-y-4">
+              <div>
+                <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Bean Name / Roaster</label>
+                <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)}
+                  placeholder="e.g. Blue Bottle Hayes Valley"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" />
               </div>
 
-              <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wider" style={{fontSize: '0.65rem'}}>Tasting Notes</label>
-              <textarea 
-                className="w-full border border-gray-700 rounded-lg p-3 h-28 focus:ring-4 focus:ring-purple-500/20 focus:border-purple-500 focus:outline-none resize-none font-medium text-gray-200 bg-gray-800"
-                placeholder="Describe the acidity, body, and finish..."
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                style={{fontSize: '0.875rem'}}
-              />
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Origin</label>
+                  <select value={origin} onChange={e => setOrigin(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                    {COUNTRIES.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Varietal</label>
+                  <select value={varietal} onChange={e => setVarietal(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                    {VARIETALS.map(v => <option key={v}>{v}</option>)}
+                  </select>
+                </div>
+              </div>
 
-              <div className="grid grid-cols-2 gap-3 mt-5">
-                <Button variant="secondary" onClick={onCancel} className="py-2.5">Skip</Button>
-                <Button onClick={() => onSave(rating, notes)} className="py-2.5">Save & Close</Button>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Roast Level</label>
+                  <select value={roast} onChange={e => setRoast(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                    <option value="light">Light</option>
+                    <option value="medium">Medium</option>
+                    <option value="dark">Dark</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Roast Date</label>
+                  <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)}
+                    className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" style={{colorScheme:'dark'}} />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-2">Rating</label>
+                <div className="flex gap-2 justify-center">
+                  {[1,2,3,4,5].map(s => (
+                    <button key={s} onClick={() => setRating(s)} className="transition-transform hover:scale-110">
+                      <Star className={`w-8 h-8 ${s <= rating ? 'text-amber-400' : 'text-gray-700'}`} fill={s <= rating ? 'currentColor' : 'none'} />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">Tasting Notes</label>
+                <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
+                  placeholder="How did it taste?"
+                  className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white resize-none" />
               </div>
             </Card>
+
+            <Button onClick={handleSave} disabled={saving} className="w-full py-3">
+              {saving ? 'Saving...' : user ? 'Save to Journal' : 'Sign in to Save'}
+            </Button>
           </div>
         );
       };
 
-      const [showManualEntry, setShowManualEntry] = useState(false);
-      const [editingLog, setEditingLog] = useState(null);
+      // Journal / History View
+      const HistoryView = () => {
+        const [showAdd, setShowAdd] = useState(false);
+        const [editingLog, setEditingLog] = useState(null);
 
-      const ManualEntryModal = ({ editingLog = null }) => {
-        const [brewType, setBrewType] = useState(editingLog?.method === 'espresso' ? 'espresso' : 'pourover');
-        const [entryMethod, setEntryMethod] = useState(editingLog?.method || 'v60');
-        const [entryOrigin, setEntryOrigin] = useState(editingLog?.origin || 'Ethiopia');
-        const [entryVarietal, setEntryVarietal] = useState(editingLog?.varietal || 'Heirloom');
-        const [entryRoast, setEntryRoast] = useState(editingLog?.roast || 'medium');
-        const [entryRoaster, setEntryRoaster] = useState(editingLog?.roaster || '');
-        const [entryCoffee, setEntryCoffee] = useState(editingLog?.coffeeAmount || 18);
-        const [entryRatio, setEntryRatio] = useState(editingLog?.ratio || 16);
-        const [entryYield, setEntryYield] = useState(editingLog?.ratio || 36);
-        const [entryTime, setEntryTime] = useState(28);
-        const [entryRating, setEntryRating] = useState(editingLog?.rating || 0);
-        const [entryNotes, setEntryNotes] = useState(editingLog?.notes || '');
-        const [entryBrewDate, setEntryBrewDate] = useState(editingLog?.brewDate || new Date().toISOString().split('T')[0]);
-        const [entryRoastDate, setEntryRoastDate] = useState(editingLog?.roastDate || '');
+        const deleteLog = async (id) => {
+          if (!confirm('Delete this entry?')) return;
+          await supabase.from('brew_logs').delete().eq('id', id);
+          loadLogs();
+        };
+
+        if (showAdd || editingLog) {
+          return <ManualEntryForm log={editingLog} onClose={() => { setShowAdd(false); setEditingLog(null); }} />;
+        }
+
+        return (
+          <div className="space-y-4 pb-24">
+            <div className="flex items-center justify-between">
+              <h2 className="text-white font-bold text-xl" style={{fontFamily: "'Pacifico', cursive"}}>Journal</h2>
+              {user && (
+                <button onClick={() => setShowAdd(true)} className="w-9 h-9 rounded-full bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+                  <Plus className="w-5 h-5 text-amber-400" />
+                </button>
+              )}
+            </div>
+
+            {!user ? (
+              <div className="text-center py-20">
+                <p className="text-gray-400 mb-4">Sign in to save your brews</p>
+                <Button onClick={signInWithGoogle}><LogIn className="w-4 h-4" /> Sign in with Google</Button>
+              </div>
+            ) : logsLoading ? (
+              <div className="text-center py-20"><Loader className="w-8 h-8 text-gray-500 animate-spin mx-auto" /></div>
+            ) : logs.length === 0 ? (
+              <div className="text-center py-20 text-gray-500">
+                <History className="w-16 h-16 mx-auto mb-4 opacity-30" />
+                <p><button onClick={() => setView('select')} className="text-amber-400 underline">Record your first brew</button> or add a past entry</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {logs.map(log => (
+                  <Card key={log.id} className="!p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <div>
+                        <h3 className="text-white font-bold">{log.beanName || log.origin}</h3>
+                        <div className="flex gap-2 text-xs text-gray-500 mt-1">
+                          <span className="bg-gray-800 px-2 py-0.5 rounded">{log.varietal}</span>
+                          <span>{log.date}</span>
+                        </div>
+                      </div>
+                      {log.rating && (
+                        <div className="flex items-center gap-1 bg-amber-500/20 px-2 py-1 rounded-full">
+                          <Star className="w-3 h-3 text-amber-400" fill="currentColor" />
+                          <span className="text-amber-400 text-xs font-bold">{log.rating}</span>
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex gap-2 text-xs text-gray-400 mb-2">
+                      <span>{BREWERS[log.method]?.name || log.method}</span>
+                      <span>•</span>
+                      <span>{log.coffee}g</span>
+                    </div>
+                    {log.notes && <p className="text-gray-500 text-sm italic">"{log.notes}"</p>}
+                    <div className="flex justify-end gap-2 mt-3 pt-2 border-t border-gray-800">
+                      <button onClick={() => setEditingLog(log)} className="text-gray-600 hover:text-amber-400"><Edit className="w-4 h-4" /></button>
+                      <button onClick={() => deleteLog(log.id)} className="text-gray-600 hover:text-red-400"><Trash className="w-4 h-4" /></button>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      };
+
+      // Manual Entry Form (for adding past brews)
+      const ManualEntryForm = ({ log, onClose }) => {
+        const [beanName, setBeanName] = useState(log?.beanName || '');
+        const [origin, setOrigin] = useState(log?.origin || 'Ethiopia');
+        const [varietal, setVarietal] = useState(log?.varietal || 'Heirloom');
+        const [roast, setRoast] = useState(log?.roast || 'medium');
+        const [roastDate, setRoastDate] = useState(log?.roastDate || '');
+        const [method, setMethod] = useState(log?.method || 'v60');
+        const [coffee, setCoffee] = useState(log?.coffee || 16);
+        const [rating, setRating] = useState(log?.rating || 0);
+        const [notes, setNotes] = useState(log?.notes || '');
         const [saving, setSaving] = useState(false);
 
         const handleSave = async () => {
           setSaving(true);
-          const logData = {
-            user_id: user.id,
-            origin: entryOrigin,
-            varietal: entryVarietal,
-            method: brewType === 'espresso' ? 'espresso' : entryMethod,
-            roast: entryRoast,
-            roaster: entryRoaster || null,
-            coffee_amount: entryCoffee || 0,
-            ratio: brewType === 'espresso' ? (entryYield || 0) : (entryRatio || 0),
-            rating: entryRating || null,
-            notes: brewType === 'espresso' 
-              ? `${entryTime}s | ${entryNotes}`.trim()
-              : entryNotes || null,
-            brew_date: entryBrewDate || null,
-            roast_date: entryRoastDate || null
+          const data = {
+            user_id: user.id, roaster: beanName, origin, varietal, roast,
+            roast_date: roastDate || null, method, coffee_amount: coffee,
+            ratio: 0, rating: rating || null, notes
           };
-          
-          console.log('Saving log:', logData);
           let result;
-          if (editingLog) {
-            result = await supabase.from('brew_logs').update(logData).eq('id', editingLog.id).select();
+          if (log) {
+            result = await supabase.from('brew_logs').update(data).eq('id', log.id);
           } else {
-            result = await supabase.from('brew_logs').insert(logData).select();
-          }
-          const { data, error } = result;
-          console.log('Response:', { data, error });
-          if (error) {
-            console.error('Error saving:', error);
-            alert('Failed to save: ' + (error.message || error.code || JSON.stringify(error)));
-          } else {
-            console.log('Saved successfully:', data);
-            await loadLogs();
-            setShowManualEntry(false);
-            setEditingLog(null);
+            result = await supabase.from('brew_logs').insert(data);
           }
           setSaving(false);
+          if (!result.error) { await loadLogs(); onClose(); }
+          else alert('Error: ' + result.error.message);
         };
 
         return (
-          <div className="space-y-4">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="font-semibold text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.25rem'}}>{editingLog ? 'Edit Entry' : 'Add Entry'}</h2>
-              <button onClick={() => { setShowManualEntry(false); setEditingLog(null); }} className="text-gray-500 hover:text-white p-1">
-                <X className="w-5 h-5" />
-              </button>
+          <div className="space-y-4 pb-24">
+            <div className="flex items-center gap-3">
+              <button onClick={onClose} className="text-gray-500 hover:text-white"><X className="w-6 h-6" /></button>
+              <h2 className="text-white font-bold">{log ? 'Edit Entry' : 'Add Entry'}</h2>
             </div>
-
-            <div className="flex bg-gray-800 p-0.5 rounded-lg border border-gray-700 mb-4">
-              <button
-                onClick={() => setBrewType('pourover')}
-                className={`flex-1 py-2 font-semibold rounded-md transition-all ${brewType === 'pourover' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'}`}
-                style={{fontSize: '0.8rem'}}
-              >
-                Pour Over
-              </button>
-              <button
-                onClick={() => setBrewType('espresso')}
-                className={`flex-1 py-2 font-semibold rounded-md transition-all ${brewType === 'espresso' ? 'bg-purple-500/20 text-purple-300' : 'text-gray-500 hover:text-gray-300'}`}
-                style={{fontSize: '0.8rem'}}
-              >
-                Espresso
-              </button>
-            </div>
-
-            <Card>
-              <div className="space-y-3">
-                {brewType === 'pourover' && (
-                  <div>
-                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Method</label>
-                    <select value={entryMethod} onChange={(e) => setEntryMethod(e.target.value)}
-                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
-                      {Object.entries(METHODS).filter(([k]) => k !== 'espresso').map(([key, m]) => (
-                        <option key={key} value={key}>{m.name}</option>
-                      ))}
-                    </select>
-                  </div>
-                )}
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Origin</label>
-                    <select value={entryOrigin} onChange={(e) => setEntryOrigin(e.target.value)}
-                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
-                      {COUNTRIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Varietal</label>
-                    <select value={entryVarietal} onChange={(e) => setEntryVarietal(e.target.value)}
-                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
-                      {VARIETALS.map(v => <option key={v} value={v}>{v}</option>)}
-                    </select>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roast</label>
-                    <select value={entryRoast} onChange={(e) => setEntryRoast(e.target.value)}
-                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}}>
-                      <option value="light">Light</option>
-                      <option value="medium">Medium</option>
-                      <option value="dark">Dark</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roaster</label>
-                    <input type="text" value={entryRoaster} onChange={(e) => setEntryRoaster(e.target.value)}
-                      placeholder="Optional" className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem'}} />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Brew Date</label>
-                    <input type="date" value={entryBrewDate} onChange={(e) => setEntryBrewDate(e.target.value)}
-                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem', colorScheme: 'dark'}} />
-                  </div>
-                  <div>
-                    <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Roast Date</label>
-                    <input type="date" value={entryRoastDate} onChange={(e) => setEntryRoastDate(e.target.value)}
-                      className="w-full border border-gray-700 rounded-lg px-2 py-2 bg-gray-800 font-medium text-gray-200" style={{fontSize: '0.875rem', colorScheme: 'dark'}} />
-                  </div>
-                </div>
-
-                {brewType === 'espresso' ? (
-                  <div className="grid grid-cols-3 gap-3">
-                    <div>
-                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Dose (g)</label>
-                      <input type="number" value={entryCoffee} onChange={(e) => setEntryCoffee(Number(e.target.value))}
-                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
-                    </div>
-                    <div>
-                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Yield (g)</label>
-                      <input type="number" value={entryYield} onChange={(e) => setEntryYield(Number(e.target.value))}
-                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
-                    </div>
-                    <div>
-                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Time (s)</label>
-                      <input type="number" value={entryTime} onChange={(e) => setEntryTime(Number(e.target.value))}
-                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
-                    </div>
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-2 gap-3">
-                    <div>
-                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Coffee (g)</label>
-                      <input type="number" value={entryCoffee} onChange={(e) => setEntryCoffee(Number(e.target.value))}
-                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
-                    </div>
-                    <div>
-                      <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide text-center" style={{fontSize: '0.65rem'}}>Ratio (1:X)</label>
-                      <input type="number" value={entryRatio} onChange={(e) => setEntryRatio(Number(e.target.value))}
-                        className="w-full border border-gray-700 rounded-lg py-1.5 bg-gray-800 font-bold text-green-400 text-center" style={{fontSize: '1rem'}} />
-                    </div>
-                  </div>
-                )}
-
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Rating</label>
-                  <div className="flex justify-center gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button key={star} onClick={() => setEntryRating(star)} className="focus:outline-none transition-transform hover:scale-110 active:scale-95">
-                        <Star className={`w-8 h-8 ${star <= entryRating ? 'text-purple-400' : 'text-gray-700'}`} fill={star <= entryRating ? 'currentColor' : 'none'} />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-gray-400 mb-1.5 uppercase tracking-wide" style={{fontSize: '0.65rem'}}>Notes</label>
-                  <textarea value={entryNotes} onChange={(e) => setEntryNotes(e.target.value)}
-                    placeholder="Tasting notes, adjustments..."
-                    className="w-full border border-gray-700 rounded-lg p-3 h-20 bg-gray-800 font-medium text-gray-200 resize-none" style={{fontSize: '0.875rem'}} />
-                </div>
-
-                <Button onClick={handleSave} disabled={saving} className="w-full py-2.5 mt-2">
-                  {saving ? 'Saving...' : 'Save Entry'}
-                </Button>
+            <Card className="space-y-3">
+              <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)} placeholder="Bean name / Roaster"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" />
+              <div className="grid grid-cols-2 gap-3">
+                <select value={origin} onChange={e => setOrigin(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                  {COUNTRIES.map(c => <option key={c}>{c}</option>)}
+                </select>
+                <select value={varietal} onChange={e => setVarietal(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                  {VARIETALS.map(v => <option key={v}>{v}</option>)}
+                </select>
               </div>
+              <div className="grid grid-cols-2 gap-3">
+                <select value={roast} onChange={e => setRoast(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                  <option value="light">Light</option><option value="medium">Medium</option><option value="dark">Dark</option>
+                </select>
+                <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white" style={{colorScheme:'dark'}} />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <select value={method} onChange={e => setMethod(e.target.value)} className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white">
+                  {Object.entries(BREWERS).map(([k,v]) => <option key={k} value={k}>{v.name}</option>)}
+                </select>
+                <input type="number" value={coffee} onChange={e => setCoffee(Number(e.target.value))} placeholder="Coffee (g)"
+                  className="bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white text-center" />
+              </div>
+              <div className="flex gap-2 justify-center py-2">
+                {[1,2,3,4,5].map(s => (
+                  <button key={s} onClick={() => setRating(s)}><Star className={`w-7 h-7 ${s <= rating ? 'text-amber-400' : 'text-gray-700'}`} fill={s <= rating ? 'currentColor' : 'none'} /></button>
+                ))}
+              </div>
+              <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={2} placeholder="Notes"
+                className="w-full bg-gray-800 border border-gray-700 rounded-lg px-3 py-2 text-white resize-none" />
             </Card>
+            <Button onClick={handleSave} disabled={saving} className="w-full py-3">{saving ? 'Saving...' : 'Save'}</Button>
           </div>
         );
       };
 
-      const HistoryView = () => {
-        if ((showManualEntry || editingLog) && user) {
-          return <ManualEntryModal editingLog={editingLog} />;
-        }
-
-        return (
-        <div className="h-[calc(100vh-5rem)] flex flex-col">
-          <div className="flex items-center justify-center mb-4 relative">
-            <h2 className="font-semibold text-white" style={{fontFamily: "'Pacifico', cursive", fontSize: '1.25rem'}}>Brew Buddy Journal</h2>
-            {user && (
-              <button 
-                onClick={() => setShowManualEntry(true)}
-                className="absolute right-0 w-9 h-9 rounded-full bg-green-500/20 border border-green-500/30 flex items-center justify-center hover:bg-green-500/30 transition-colors"
-              >
-                <Plus className="w-5 h-5 text-green-400" />
-              </button>
-            )}
-          </div>
-
-          <div className="flex-1 overflow-y-auto space-y-3 pb-20">
-            {!user ? (
-              <div className="text-center text-gray-500 py-20 flex flex-col items-center">
-                <p className="font-medium mb-2" style={{fontSize: '1rem'}}>Sign in to save your brews</p>
-                <p className="text-gray-600 mb-4" style={{fontSize: '0.875rem'}}>Your journal syncs across all devices</p>
-                <Button onClick={signInWithGoogle} className="mt-2">
-                  <LogIn className="w-4 h-4" /> Sign in with Google
-                </Button>
-              </div>
-            ) : logsLoading ? (
-              <div className="text-center text-gray-500 py-20 flex flex-col items-center">
-                <Loader className="w-12 h-12 mb-4 opacity-40 animate-spin" />
-                <p className="font-medium" style={{fontSize: '1rem'}}>Loading your brews...</p>
-              </div>
-            ) : logs.length === 0 ? (
-              <div className="text-center text-gray-500 py-20 flex flex-col items-center">
-                <History className="w-16 h-16 mb-4 opacity-20" />
-                <p className="mt-4" style={{fontSize: '0.9rem'}}>
-                  <button onClick={() => setView('config')} className="text-purple-400 hover:text-purple-300 underline">Record your first brew</button>
-                  {' '}or add an entry for a past brew
-                </p>
-              </div>
-            ) : (
-              logs.map(log => (
-                <Card key={log.id} className="!p-5 hover:border-purple-500/40 transition-colors">
-                   <div className="flex justify-between items-start mb-4">
-                     <div>
-                       <h3 className="font-semibold text-white" style={{fontFamily: "'Fraunces', serif", fontSize: '1rem'}}>{log.origin}</h3>
-                       <div className="flex items-center gap-2 mt-1">
-                          <span className="bg-purple-500/20 text-purple-300 px-2 py-0.5 rounded font-semibold uppercase tracking-wide" style={{fontSize: '0.75rem'}}>
-                            {log.varietal}
-                          </span>
-                          <span className="text-gray-500 font-medium" style={{fontSize: '0.75rem'}}>
-                            {log.date}
-                          </span>
-                       </div>
-                     </div>
-                     {log.rating && (
-                     <div className="flex items-center gap-1 bg-green-500/20 px-2.5 py-1 rounded-full ring-1 ring-green-500/30">
-                        <Star className="w-3.5 h-3.5 text-green-400" fill="currentColor" />
-                        <span className="font-bold text-green-400" style={{fontSize: '0.75rem'}}>{log.rating}</span>
-                     </div>
-                   )}
-                   </div>
-                   
-                   <div className="grid grid-cols-3 gap-2 mb-4">
-                      <div className="bg-gray-800 rounded-lg p-2">
-                         <span className="block font-bold text-green-400" style={{fontSize: '1rem'}}>{log.coffeeAmount}g</span>
-                         <span className="text-gray-500 uppercase tracking-wider font-semibold" style={{fontSize: '0.75rem'}}>Coffee</span>
-                      </div>
-                      <div className="bg-gray-800 rounded-lg p-2">
-                         <span className="block font-bold text-green-400" style={{fontSize: '1rem'}}>1:{log.ratio}</span>
-                         <span className="text-gray-500 uppercase tracking-wider font-semibold" style={{fontSize: '0.75rem'}}>Ratio</span>
-                      </div>
-                      <div className="bg-gray-800 rounded-lg p-2">
-                         <span className="block capitalize font-semibold text-gray-200" style={{fontSize: '1rem'}}>{log.roast}</span>
-                         <span className="text-gray-500 uppercase tracking-wider font-semibold" style={{fontSize: '0.75rem'}}>Roast</span>
-                      </div>
-                   </div>
-
-                   {log.notes && (
-                     <p className="text-gray-400 italic border-l-2 border-purple-500/50 pl-3 py-1" style={{fontSize: '0.85rem'}}>
-                       "{log.notes}"
-                     </p>
-                   )}
-                   
-                   <div className="flex justify-end gap-3 mt-3 pt-3 border-t border-gray-800">
-                     <button 
-                       onClick={() => setEditingLog(log)}
-                       className="text-gray-500 hover:text-purple-400 transition-colors"
-                     >
-                       <Edit className="w-4 h-4" />
-                     </button>
-                     <button 
-                       onClick={() => deleteLog(log.id)}
-                       className="text-gray-500 hover:text-red-400 transition-colors"
-                     >
-                       <Trash className="w-4 h-4" />
-                     </button>
-                   </div>
-                </Card>
-              ))
-            )}
-          </div>
-        </div>
-      );
-      };
-
       return (
-        <div className="min-h-screen bg-black text-gray-100 font-sans selection:bg-purple-500/30">
-          <nav className="fixed bottom-0 left-0 right-0 bg-black/90 backdrop-blur-md border-t border-purple-500/30 px-10 py-2 flex justify-around items-center z-50 md:hidden pb-safe">
-             <button onClick={() => setView('config')} className={`flex items-center gap-2 px-4 py-1.5 rounded-full transition-all ${view === 'config' ? 'text-green-400 bg-green-400/10' : 'text-gray-500'}`}>
-                <Coffee className="w-4 h-4" />
-                <span className="font-semibold uppercase tracking-wider" style={{fontSize: '0.75rem'}}>Brew</span>
-             </button>
-             <button onClick={() => setView('history')} className={`flex items-center gap-2 px-4 py-1.5 rounded-full transition-all ${view === 'history' ? 'text-green-400 bg-green-400/10' : 'text-gray-500'}`}>
-                <History className="w-4 h-4" />
-                <span className="font-semibold uppercase tracking-wider" style={{fontSize: '0.75rem'}}>Journal</span>
-             </button>
+        <div className="min-h-screen bg-black text-gray-100">
+          {/* Bottom Nav */}
+          <nav className="fixed bottom-0 left-0 right-0 bg-black/95 backdrop-blur border-t border-gray-800 px-8 py-3 flex justify-around z-50 pb-safe">
+            <button onClick={() => { setView('select'); setSelectedBrewer(null); setSelectedRecipe(null); }}
+              className={`flex flex-col items-center gap-1 ${['select','recipe','brew','log'].includes(view) ? 'text-amber-400' : 'text-gray-600'}`}>
+              <Coffee className="w-5 h-5" />
+              <span className="text-xs font-semibold">Brew</span>
+            </button>
+            <button onClick={() => setView('history')}
+              className={`flex flex-col items-center gap-1 ${view === 'history' ? 'text-amber-400' : 'text-gray-600'}`}>
+              <History className="w-5 h-5" />
+              <span className="text-xs font-semibold">Journal</span>
+            </button>
           </nav>
 
-          <main className="px-4 py-5 min-h-screen pb-24 md:pb-8 max-w-md mx-auto">
-            {view === 'config' && configView}
+          <main className="px-4 py-5 max-w-md mx-auto">
+            {view === 'select' && <SelectBrewerView />}
+            {view === 'recipe' && <SelectRecipeView />}
             {view === 'brew' && <BrewSessionView />}
+            {view === 'log' && <LogBrewView />}
             {view === 'history' && <HistoryView />}
           </main>
         </div>
