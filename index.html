@@ -837,7 +837,6 @@ Only return the JSON, no other text.` },
         const [notes, setNotes] = useState('');
         const [saving, setSaving] = useState(false);
         const [scanning, setScanning] = useState(false);
-        const fileInputRef = useRef(null);
         
         const hasRecipe = selectedRecipe && selectedBrewer;
 
@@ -984,25 +983,23 @@ Only return the JSON, no other text.` },
                 <div className="flex items-center gap-2">
                   <span>☕</span> bean info
                 </div>
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  disabled={scanning}
-                  className="flex items-center gap-2 px-3 py-1.5 bg-purple-900/50 border-2 border-purple-500 text-purple-300 hover:bg-purple-800/50 transition-colors disabled:opacity-50"
-                  style={{borderRadius: '0'}}>
+                <label 
+                  className="flex items-center gap-2 px-3 py-1.5 bg-purple-900/50 border-2 border-purple-500 text-purple-300 hover:bg-purple-800/50 transition-colors cursor-pointer"
+                  style={{borderRadius: '0', opacity: scanning ? 0.5 : 1}}>
                   {scanning ? (
                     <><Loader className="w-4 h-4 animate-spin" /> scanning...</>
                   ) : (
                     <><Camera className="w-4 h-4" /> scan label</>
                   )}
-                </button>
-                <input 
-                  ref={fileInputRef}
-                  type="file" 
-                  accept="image/*" 
-                  capture="environment"
-                  onChange={handleScanLabel}
-                  className="hidden" 
-                />
+                  <input 
+                    type="file" 
+                    accept="image/*" 
+                    capture="environment"
+                    onChange={handleScanLabel}
+                    disabled={scanning}
+                    className="hidden" 
+                  />
+                </label>
               </div>
               <Card className="space-y-4">
                 <div>
