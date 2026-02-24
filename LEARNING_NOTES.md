@@ -126,6 +126,34 @@ When users "Add to Home Screen" from Safari, iOS looks for special meta tags:
 
 ---
 
+## JavaScript APIs
+
+### Web Share API
+Lets users share content using the native OS share sheet (iMessage, SMS, WhatsApp, email, etc.):
+
+```javascript
+if (navigator.share) {
+  await navigator.share({
+    text: 'Check out this coffee!',
+    title: 'My Brew',
+    url: 'https://example.com'  // optional
+  });
+} else {
+  // Fallback for desktop - copy to clipboard
+  await navigator.clipboard.writeText(text);
+  alert('Copied to clipboard!');
+}
+```
+
+**Requirements:**
+- Only works on mobile browsers (iOS Safari, Android Chrome)
+- Must be HTTPS (or localhost for testing)
+- Must be triggered by user action (click/tap)
+
+Always check `if (navigator.share)` first and provide a fallback!
+
+---
+
 ## Git & Deployment
 
 *More concepts will be added as we encounter them...*
