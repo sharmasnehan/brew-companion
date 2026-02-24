@@ -258,13 +258,15 @@
     const GEMINI_API_KEY = 'AIzaSyCmzSs4wCcvizfZ44qRoXTMB64DnmFwQK8';
     
     const scanCoffeeLabel = async (imageBase64) => {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          contents: [{
-            parts: [
-              { text: `Analyze this coffee bag label image and extract the following information. Return ONLY a valid JSON object with these fields (use null if not found):
+      console.log('Scanning label, image size:', imageBase64.length);
+      try {
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [
+                { text: `Analyze this coffee bag label image and extract the following information. Return ONLY a valid JSON object with these fields (use null if not found):
 {
   "roaster": "brand/roaster name",
   "origin": "country of origin (must be one of: Ethiopia, Colombia, Brazil, Guatemala, Costa Rica, Kenya, Indonesia, Honduras, Panama, El Salvador, Nepal, India, Rwanda, Burundi, or Other)",
@@ -273,16 +275,31 @@
   "roastDate": "roast date in YYYY-MM-DD format if found"
 }
 Only return the JSON, no other text.` },
-              { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } }
-            ]
-          }]
-        })
-      });
-      const data = await response.json();
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
-      // Extract JSON from response (handle markdown code blocks)
-      const jsonMatch = text.match(/\{[\s\S]*\}/);
-      return jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+                { inlineData: { mimeType: 'image/jpeg', data: imageBase64 } }
+              ]
+            }]
+          })
+        });
+        const data = await response.json();
+        console.log('Gemini response:', data);
+        
+        if (data.error) {
+          console.error('Gemini API error:', data.error);
+          throw new Error(data.error.message || 'API error');
+        }
+        
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '{}';
+        console.log('Extracted text:', text);
+        
+        // Extract JSON from response (handle markdown code blocks)
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        const result = jsonMatch ? JSON.parse(jsonMatch[0]) : {};
+        console.log('Parsed result:', result);
+        return result;
+      } catch (err) {
+        console.error('scanCoffeeLabel error:', err);
+        throw err;
+      }
     };
 
     const COUNTRIES = ['Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 'Nepal', 'India', 'Rwanda', 'Burundi', 'Other'];
@@ -833,16 +850,55 @@ Only return the JSON, no other text.` },
             // Convert to base64
             const reader = new FileReader();
             reader.onload = async () => {
-              const base64 = reader.result.split(',')[1];
-              const result = await scanCoffeeLabel(base64);
-              
-              // Populate fields with extracted data
-              if (result.roaster) setBeanName(result.roaster);
-              if (result.origin && COUNTRIES.includes(result.origin)) setOrigin(result.origin);
-              if (result.varietal && VARIETALS.includes(result.varietal)) setVarietal(result.varietal);
-              if (result.roast && ['light', 'medium', 'dark'].includes(result.roast)) setRoast(result.roast);
-              if (result.roastDate) setRoastDate(result.roastDate);
-              
+              try {
+                const base64 = reader.result.split(',')[1];
+                console.log('File loaded, calling Gemini...');
+                const result = await scanCoffeeLabel(base64);
+                console.log('Got result:', result);
+                
+                // Populate fields with extracted data
+                if (result.roaster) {
+                  console.log('Setting bean name:', result.roaster);
+                  setBeanName(result.roaster);
+                }
+                if (result.origin) {
+                  const matchedOrigin = COUNTRIES.find(c => c.toLowerCase() === result.origin.toLowerCase()) || 
+                                        (COUNTRIES.includes(result.origin) ? result.origin : null);
+                  if (matchedOrigin) {
+                    console.log('Setting origin:', matchedOrigin);
+                    setOrigin(matchedOrigin);
+                  }
+                }
+                if (result.varietal) {
+                  const matchedVarietal = VARIETALS.find(v => v.toLowerCase() === result.varietal.toLowerCase()) ||
+                                          (VARIETALS.includes(result.varietal) ? result.varietal : null);
+                  if (matchedVarietal) {
+                    console.log('Setting varietal:', matchedVarietal);
+                    setVarietal(matchedVarietal);
+                  }
+                }
+                if (result.roast) {
+                  const roastLower = result.roast.toLowerCase();
+                  if (['light', 'medium', 'dark'].includes(roastLower)) {
+                    console.log('Setting roast:', roastLower);
+                    setRoast(roastLower);
+                  }
+                }
+                if (result.roastDate) {
+                  console.log('Setting roast date:', result.roastDate);
+                  setRoastDate(result.roastDate);
+                }
+                
+                setScanning(false);
+              } catch (err) {
+                console.error('Error processing scan:', err);
+                alert('failed to scan label: ' + err.message);
+                setScanning(false);
+              }
+            };
+            reader.onerror = () => {
+              console.error('FileReader error');
+              alert('failed to read image file');
               setScanning(false);
             };
             reader.readAsDataURL(file);
