@@ -251,6 +251,7 @@
     const X = (props) => <Icon name="X" {...props} />;
     const Trash = (props) => <Icon name="Trash2" {...props} />;
     const Edit = (props) => <Icon name="Pencil" {...props} />;
+    const Share = (props) => <Icon name="Share2" {...props} />;
 
     const COUNTRIES = ['Ethiopia', 'Colombia', 'Brazil', 'Guatemala', 'Costa Rica', 'Kenya', 'Indonesia', 'Honduras', 'Panama', 'El Salvador', 'Nepal', 'India', 'Rwanda', 'Burundi', 'Other'];
     const VARIETALS = ['Heirloom', 'Bourbon', 'Typica', 'Caturra', 'Catuai', 'Geisha', 'SL-28', 'SL-34', 'Pacamara', 'Castillo', 'Blend', 'Other'];
@@ -965,6 +966,31 @@
           loadLogs();
         };
 
+        const shareLog = async (log) => {
+          const stars = log.rating ? '⭐'.repeat(log.rating) : '';
+          const text = [
+            `☕ ${log.beanName || log.origin || 'Coffee'}`,
+            log.origin && log.varietal ? `${log.origin} • ${log.varietal}` : (log.origin || log.varietal || ''),
+            log.method ? `Brewed with: ${BREWERS[log.method]?.name || log.method}` : '',
+            stars,
+            log.notes ? `"${log.notes}"` : '',
+            '',
+            '— via Brew Buddy'
+          ].filter(Boolean).join('\n');
+
+          if (navigator.share) {
+            try {
+              await navigator.share({ text });
+            } catch (err) {
+              // User cancelled or error
+            }
+          } else {
+            // Fallback: copy to clipboard
+            await navigator.clipboard.writeText(text);
+            alert('Copied to clipboard!');
+          }
+        };
+
         const filteredLogs = ratingFilter === 0 
           ? logs 
           : logs.filter(log => log.rating >= ratingFilter);
@@ -1064,6 +1090,7 @@
                         <span> • {log.date}</span>
                       </div>
                       <div className="flex gap-3">
+                        <button onClick={() => shareLog(log)} className="text-gray-600 hover:text-purple-400"><Share className="w-4 h-4" /></button>
                         <button onClick={() => setEditingLog(log)} className="text-gray-600 hover:text-green-400"><Edit className="w-4 h-4" /></button>
                         <button onClick={() => deleteLog(log.id)} className="text-gray-600 hover:text-red-400"><Trash className="w-4 h-4" /></button>
                       </div>
