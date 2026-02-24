@@ -1042,7 +1042,7 @@ Only return the JSON, no other text.` },
       // Journal / History View
       const HistoryView = () => {
         const [editingLog, setEditingLog] = useState(null);
-        const [ratingFilter, setRatingFilter] = useState(0); // 0 = show all
+        const [sortByRating, setSortByRating] = useState(false); // false = by date, true = by stars
 
         const deleteLog = async (id) => {
           if (!confirm('delete this entry?')) return;
@@ -1075,9 +1075,9 @@ Only return the JSON, no other text.` },
           }
         };
 
-        const filteredLogs = ratingFilter === 0 
-          ? logs 
-          : logs.filter(log => log.rating >= ratingFilter);
+        const sortedLogs = sortByRating 
+          ? [...logs].sort((a, b) => (b.rating || 0) - (a.rating || 0))
+          : logs;
 
         if (editingLog) {
           return <ManualEntryForm log={editingLog} onClose={() => { setEditingLog(null); }} />;
@@ -1094,26 +1094,23 @@ Only return the JSON, no other text.` },
               )}
             </div>
 
-            {/* Rating Filter */}
+            {/* Sort Toggle */}
             {user && logs.length > 0 && (
               <div className="flex items-center gap-2">
-                <span className="ds-card-footer">filter:</span>
+                <span className="ds-card-footer">sort:</span>
                 <div className="flex gap-1">
                   <button 
-                    onClick={() => setRatingFilter(0)}
-                    className={`px-3 py-1 border-2 text-sm ${ratingFilter === 0 ? 'bg-purple-600 border-purple-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}
+                    onClick={() => setSortByRating(false)}
+                    className={`px-3 py-1 border-2 text-sm ${!sortByRating ? 'bg-purple-600 border-purple-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}
                     style={{borderRadius: '0'}}>
-                    all
+                    recent
                   </button>
-                  {[3, 4, 5].map(r => (
-                    <button 
-                      key={r}
-                      onClick={() => setRatingFilter(r)}
-                      className={`px-3 py-1 border-2 text-sm flex items-center gap-1 ${ratingFilter === r ? 'bg-purple-600 border-purple-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}
-                      style={{borderRadius: '0'}}>
-                      {r}+ <Star className="w-3 h-3" fill="currentColor" />
-                    </button>
-                  ))}
+                  <button 
+                    onClick={() => setSortByRating(true)}
+                    className={`px-3 py-1 border-2 text-sm flex items-center gap-1 ${sortByRating ? 'bg-purple-600 border-purple-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}
+                    style={{borderRadius: '0'}}>
+                    <Star className="w-3 h-3" fill="currentColor" /> top rated
+                  </button>
                 </div>
               </div>
             )}
@@ -1135,11 +1132,7 @@ Only return the JSON, no other text.` },
               </div>
             ) : (
               <div className="space-y-3">
-                {filteredLogs.length === 0 ? (
-                  <div className="text-center py-10 text-gray-500">
-                    <p className="text-lg">no brews match this filter</p>
-                  </div>
-                ) : filteredLogs.map(log => (
+                {sortedLogs.map(log => (
                   <Card key={log.id} className="bounce-pixel">
                     {/* Bean name as focal point */}
                     <h3 className="ds-card-title mb-2">{log.beanName || log.origin || 'unknown'}</h3>
