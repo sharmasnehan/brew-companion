@@ -852,47 +852,54 @@ Only return the JSON, no other text.` },
             reader.onload = async () => {
               try {
                 const base64 = reader.result.split(',')[1];
-                console.log('File loaded, calling Gemini...');
                 const result = await scanCoffeeLabel(base64);
-                console.log('Got result:', result);
+                
+                // Track what we found
+                let found = [];
                 
                 // Populate fields with extracted data
                 if (result.roaster) {
-                  console.log('Setting bean name:', result.roaster);
                   setBeanName(result.roaster);
+                  found.push('roaster: ' + result.roaster);
                 }
                 if (result.origin) {
                   const matchedOrigin = COUNTRIES.find(c => c.toLowerCase() === result.origin.toLowerCase()) || 
                                         (COUNTRIES.includes(result.origin) ? result.origin : null);
                   if (matchedOrigin) {
-                    console.log('Setting origin:', matchedOrigin);
                     setOrigin(matchedOrigin);
+                    found.push('origin: ' + matchedOrigin);
                   }
                 }
                 if (result.varietal) {
                   const matchedVarietal = VARIETALS.find(v => v.toLowerCase() === result.varietal.toLowerCase()) ||
                                           (VARIETALS.includes(result.varietal) ? result.varietal : null);
                   if (matchedVarietal) {
-                    console.log('Setting varietal:', matchedVarietal);
                     setVarietal(matchedVarietal);
+                    found.push('varietal: ' + matchedVarietal);
                   }
                 }
                 if (result.roast) {
                   const roastLower = result.roast.toLowerCase();
                   if (['light', 'medium', 'dark'].includes(roastLower)) {
-                    console.log('Setting roast:', roastLower);
                     setRoast(roastLower);
+                    found.push('roast: ' + roastLower);
                   }
                 }
                 if (result.roastDate) {
-                  console.log('Setting roast date:', result.roastDate);
                   setRoastDate(result.roastDate);
+                  found.push('date: ' + result.roastDate);
                 }
                 
                 setScanning(false);
+                
+                // Show what was found (temporary for debugging)
+                if (found.length > 0) {
+                  alert('found: ' + found.join(', '));
+                } else {
+                  alert('no info found on label. raw response: ' + JSON.stringify(result));
+                }
               } catch (err) {
-                console.error('Error processing scan:', err);
-                alert('failed to scan label: ' + err.message);
+                alert('scan error: ' + err.message);
                 setScanning(false);
               }
             };
