@@ -159,7 +159,7 @@
     .ds-section-header {
       font-family: 'Press Start 2P', cursive;
       font-size: 0.7rem;
-      text-transform: uppercase;
+      text-transform: lowercase;
       letter-spacing: 0.05em;
       color: #4ade80; /* green-400 */
     }
@@ -546,26 +546,26 @@
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <Coffee className="w-8 h-8 text-purple-400" />
-              <h1 className="text-purple-400 pixel-glow" style={{fontSize: '1rem', letterSpacing: '2px'}}>BREW BUDDY</h1>
+              <h1 className="text-purple-400 pixel-glow" style={{fontSize: '1rem', letterSpacing: '2px'}}>brew buddy</h1>
             </div>
             {authLoading ? <Loader className="w-5 h-5 text-gray-500 animate-spin" /> : user ? (
               <button onClick={signOut} className="w-9 h-9 rounded-full overflow-hidden border-2 border-purple-500/50">
                 {user.user_metadata?.avatar_url ? <img src={user.user_metadata.avatar_url} className="w-full h-full" /> : <User className="w-5 h-5 text-purple-400" />}
               </button>
             ) : (
-              <button onClick={signInWithGoogle} className="px-3 py-1.5 rounded-lg bg-green-500/20 border border-green-500/30 text-green-400 font-semibold text-sm">Login</button>
+              <button onClick={signInWithGoogle} className="px-3 py-1.5 rounded-lg bg-green-500/20 border border-green-500/30 text-green-400 font-semibold text-sm">login</button>
             )}
           </div>
 
               <div>
-            <h2 className="text-green-400 uppercase tracking-wider mb-4 blink" style={{fontSize: '0.7rem'}}>» CHOOSE YOUR BREWER «</h2>
+            <h2 className="text-green-400 lowercase tracking-wider mb-4 blink" style={{fontSize: '0.7rem'}}>» choose your brewer «</h2>
             <div className="grid grid-cols-2 gap-3">
               {Object.entries(BREWERS).map(([key, brewer], index) => (
                 <div key={key} onClick={() => { setSelectedBrewer(key); setView('recipe'); }} 
                   className="cursor-pointer ember-glow">
                   <div className="bg-gray-900 p-4 flex flex-col items-center hover:bg-gray-800 transition-colors border-4 border-gray-700" style={{borderRadius: '0'}}>
                     <img src={brewer.image} alt={brewer.name} className="w-16 h-16 object-contain mb-2" style={{imageRendering: 'pixelated'}} />
-                    <span className="text-purple-300 text-lg">{brewer.name.toUpperCase()}</span>
+                    <span className="text-purple-300 text-lg">{brewer.name.toLowerCase()}</span>
                   </div>
                 </div>
                   ))}
@@ -591,7 +591,7 @@
               </div>
             </div>
 
-            <h2 className="text-green-400 uppercase tracking-wider mb-3 blink" style={{fontSize: '0.7rem'}}>» CHOOSE RECIPE «</h2>
+            <h2 className="text-green-400 lowercase tracking-wider mb-3 blink" style={{fontSize: '0.7rem'}}>» choose recipe «</h2>
             
             <div className="space-y-3">
               {recipes.map((recipe) => (
@@ -605,17 +605,17 @@
                   {/* Best For */}
                   {recipe.bestFor && (
                     <div className="ds-card-meta mb-4">
-                      <span className="ds-accent">Recommended for:</span> {recipe.bestFor}
+                      <span className="ds-accent">recommended for:</span> {recipe.bestFor}
                     </div>
                   )}
                   
                   <div className="flex justify-between items-center">
-                    <span className="ds-card-footer ds-accent-purple">{recipe.name.toUpperCase()}</span>
+                    <span className="ds-card-footer ds-accent-purple">{recipe.name.toLowerCase()}</span>
                     {recipe.source && (
                       <a href={recipe.source} target="_blank" rel="noopener noreferrer" 
-                        className="ds-card-footer hover:text-purple-400 uppercase tracking-wider flex items-center gap-1"
+                        className="ds-card-footer hover:text-purple-400 lowercase tracking-wider flex items-center gap-1"
                         onClick={(e) => e.stopPropagation()}>
-                        SOURCE <ExternalLink className="w-3 h-3" />
+                        source <ExternalLink className="w-3 h-3" />
                       </a>
                     )}
                   </div>
@@ -642,7 +642,7 @@
           name: 'Prep',
           water: 0,
           duration: 0,
-          instruction: `Grind ${recipe?.coffee}g ${recipe?.grind}. Heat water to ${recipe?.temp}°C / ${cToF(recipe?.temp)}°F`,
+          instruction: `grind ${recipe?.coffee}g ${recipe?.grind?.toLowerCase()}. heat water to ${recipe?.temp}°C / ${cToF(recipe?.temp)}°F`,
           isPrep: true
         };
         const steps = [prepStep, ...(recipe?.steps || [])];
@@ -677,13 +677,13 @@
               <div className="w-20 h-20 rounded-full bg-green-500/20 flex items-center justify-center">
                 <Check className="w-10 h-10 text-green-400" />
               </div>
-              <h2 className="text-green-400 pixel-glow" style={{fontSize: '1rem'}}>BREW COMPLETE!</h2>
-              <p className="text-gray-400 text-xl">TIME: {formatTime(totalTime)}</p>
+              <h2 className="text-green-400 pixel-glow" style={{fontSize: '1rem'}}>brew complete!</h2>
+              <p className="text-gray-400 text-xl">time: {formatTime(totalTime)}</p>
               <Button onClick={() => setView('log')} className="w-full max-w-xs py-3">
-                Log This Brew <ChevronRight className="w-4 h-4" />
+                log this brew <ChevronRight className="w-4 h-4" />
               </Button>
               <button onClick={() => { setView('select'); setSelectedRecipe(null); setSelectedBrewer(null); }} 
-                className="text-gray-500 hover:text-white text-sm">Skip logging</button>
+                className="text-gray-500 hover:text-white text-sm">skip logging</button>
             </div>
           );
         }
@@ -696,7 +696,7 @@
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <div className="text-center">
-                <div className="text-purple-400 font-semibold text-xs uppercase tracking-wider">{BREWERS[selectedBrewer]?.name}</div>
+                <div className="text-purple-400 font-semibold text-xs lowercase tracking-wider">{BREWERS[selectedBrewer]?.name}</div>
                 <div className="text-white font-bold">{recipe?.name}</div>
               </div>
               <div className="text-green-400 text-lg">{formatTime(totalTime)}</div>
@@ -725,15 +725,15 @@
               {/* Current Step Card */}
               <Card className="!p-6 border-purple-500/30 flex-1">
               <div className="text-center space-y-4">
-                <div className="text-gray-500" style={{fontSize: '0.7rem'}}>STAGE {currentStep + 1}/{steps.length}</div>
-                <h3 className="text-purple-400 pixel-glow blink" style={{fontSize: '1rem'}}>{step?.name?.toUpperCase()}</h3>
+                <div className="text-gray-500" style={{fontSize: '0.7rem'}}>stage {currentStep + 1}/{steps.length}</div>
+                <h3 className="text-purple-400 pixel-glow blink" style={{fontSize: '1rem'}}>{step?.name?.toLowerCase()}</h3>
                 <p className="text-gray-300 text-2xl mt-2">{step?.instruction}</p>
                 
                 {step?.water > 0 && (
                   <div className="inline-block bg-purple-500/20 px-8 py-3 border border-purple-500/30" style={{transform: 'skewX(-10deg)'}}>
                     <div style={{transform: 'skewX(10deg)'}}>
                       <div className="text-green-400 text-3xl font-bold font-mono">{step.water}g</div>
-                      <div className="text-purple-400/70 text-xs uppercase">Target</div>
+                      <div className="text-purple-400/70 text-xs">target</div>
                     </div>
                   </div>
                 )}
@@ -756,20 +756,20 @@
               {step?.duration === 0 ? (
                 /* Manual step - just a continue button */
                 <Button onClick={() => { setCurrentStep(c => c + 1); setTimeInStep(0); }} className="py-4">
-                  READY <ChevronRight className="w-5 h-5" />
+                  ready <ChevronRight className="w-5 h-5" />
                 </Button>
               ) : !isRunning ? (
                 <Button onClick={() => setIsRunning(true)} className="py-4">
-                  <Play className="w-5 h-5" fill="currentColor" /> {totalTime > 0 ? 'RESUME' : 'START'}
+                  <Play className="w-5 h-5" fill="currentColor" /> {totalTime > 0 ? 'resume' : 'start'}
                 </Button>
               ) : (
                 <Button onClick={() => setIsRunning(false)} variant="secondary" className="py-4">
-                  <Pause className="w-5 h-5" fill="currentColor" /> PAUSE
+                  <Pause className="w-5 h-5" fill="currentColor" /> pause
                 </Button>
               )}
             </div>
             <Button onClick={() => setView('log')} variant="ghost" className="w-full mt-2">
-              <SkipForward className="w-4 h-4" /> SKIP TO LOG
+              <SkipForward className="w-4 h-4" /> skip to log
             </Button>
           </div>
         );
@@ -811,7 +811,7 @@
             setSelectedRecipe(null);
             setSelectedBrewer(null);
           } else {
-            alert('Failed to save: ' + error.message);
+            alert('failed to save: ' + error.message);
           }
         };
 
@@ -823,7 +823,7 @@
                 <ChevronLeft className="w-6 h-6" />
               </button>
               <h2 className="text-purple-400 pixel-glow" style={{fontSize: '0.9rem'}}>
-                {hasRecipe ? '☕ LOG BREW' : '+ NEW ENTRY'}
+                {hasRecipe ? '☕ log brew' : '+ new entry'}
               </h2>
               <div className="w-6" /> {/* Spacer for centering */}
             </div>
@@ -835,7 +835,7 @@
                 <div className="flex items-center gap-4">
                   <img src={BREWERS[selectedBrewer]?.image} alt="" className="w-12 h-12 object-contain opacity-80" />
                   <div className="flex-1">
-                    <div className="text-purple-300 text-sm uppercase tracking-wider">{BREWERS[selectedBrewer]?.name}</div>
+                    <div className="text-purple-300 text-sm lowercase tracking-wider">{BREWERS[selectedBrewer]?.name}</div>
                     <div className="text-white text-xl">{selectedRecipe.name}</div>
                   </div>
                   <div className="text-right">
@@ -848,27 +848,27 @@
 
             {/* Section: Bean Info */}
             <div>
-              <div className="text-green-400 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span>☕</span> BEAN INFO
+              <div className="text-green-400 text-sm lowercase tracking-wider mb-3 flex items-center gap-2">
+                <span>☕</span> bean info
               </div>
               <Card className="space-y-4">
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Bean Name / Roaster</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">bean name / roaster</label>
                   <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)}
-                    placeholder="e.g. Blue Bottle Hayes Valley"
+                    placeholder="e.g. blue bottle hayes valley"
                     className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Origin</label>
+                    <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">origin</label>
                     <select value={origin} onChange={e => setOrigin(e.target.value)}
                       className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                       {COUNTRIES.map(c => <option key={c}>{c}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Varietal</label>
+                    <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">varietal</label>
                     <select value={varietal} onChange={e => setVarietal(e.target.value)}
                       className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                       {VARIETALS.map(v => <option key={v}>{v}</option>)}
@@ -878,16 +878,16 @@
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Level</label>
+                    <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">roast level</label>
                     <select value={roast} onChange={e => setRoast(e.target.value)}
                       className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
-                      <option value="light">Light</option>
-                      <option value="medium">Medium</option>
-                      <option value="dark">Dark</option>
+                      <option value="light">light</option>
+                      <option value="medium">medium</option>
+                      <option value="dark">dark</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Date</label>
+                    <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">roast date</label>
                     <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)}
                       className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{colorScheme:'dark', borderRadius: '0'}} />
                   </div>
@@ -898,20 +898,20 @@
             {/* Section: Brew Details (only when NOT coming from brew flow) */}
             {!hasRecipe && (
               <div>
-                <div className="text-green-400 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
-                  <span>⚗️</span> BREW DETAILS
+                <div className="text-green-400 text-sm lowercase tracking-wider mb-3 flex items-center gap-2">
+                  <span>⚗️</span> brew details
                 </div>
                 <Card className="space-y-4">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Brew Method</label>
+                      <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">brew method</label>
                       <select value={method} onChange={e => setMethod(e.target.value)}
                         className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                         {Object.entries(BREWERS).map(([k,v]) => <option key={k} value={k}>{v.name}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Coffee (g)</label>
+                      <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">coffee (g)</label>
                       <input type="number" value={coffee} onChange={e => setCoffee(e.target.value === '' ? '' : Number(e.target.value))}
                         placeholder="e.g. 18"
                         className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg text-center focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
@@ -923,12 +923,12 @@
 
             {/* Section: Rating & Notes */}
             <div>
-              <div className="text-green-400 text-sm uppercase tracking-wider mb-3 flex items-center gap-2">
-                <span>⭐</span> YOUR REVIEW
+              <div className="text-green-400 text-sm lowercase tracking-wider mb-3 flex items-center gap-2">
+                <span>⭐</span> your review
               </div>
               <Card className="space-y-4">
                 <div>
-                  <label className="block text-gray-400 text-sm uppercase tracking-wider mb-3 text-center">HOW WAS IT?</label>
+                  <label className="block text-gray-400 text-sm lowercase tracking-wider mb-3 text-center">how was it?</label>
                   <div className="flex gap-3 justify-center">
                     {[1,2,3,4,5].map(s => (
                       <button key={s} onClick={() => setRating(s)} className={`w-12 h-12 border-2 flex items-center justify-center transition-all ${s <= rating ? 'bg-green-500 border-green-300 text-black' : 'bg-gray-800 border-gray-600 text-gray-600'}`} style={{borderRadius: '0'}}>
@@ -939,9 +939,9 @@
                 </div>
 
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Tasting Notes</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">tasting notes</label>
                   <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3}
-                    placeholder="Fruity? Chocolatey? Nutty? How did it taste?"
+                    placeholder="fruity? chocolatey? nutty? how did it taste?"
                     className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg resize-none focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
                 </div>
               </Card>
@@ -949,7 +949,7 @@
 
             {/* Save Button */}
             <Button onClick={handleSave} disabled={saving} className="w-full py-4 text-xl">
-              {saving ? 'SAVING...' : user ? '💾 SAVE TO LOG' : '🔐 SIGN IN TO SAVE'}
+              {saving ? 'saving...' : user ? '💾 save to log' : '🔐 sign in to save'}
             </Button>
           </div>
         );
@@ -961,7 +961,7 @@
         const [ratingFilter, setRatingFilter] = useState(0); // 0 = show all
 
         const deleteLog = async (id) => {
-          if (!confirm('Delete this entry?')) return;
+          if (!confirm('delete this entry?')) return;
           await supabase.from('brew_logs').delete().eq('id', id);
           loadLogs();
         };
@@ -969,13 +969,13 @@
         const shareLog = async (log) => {
           const stars = log.rating ? '⭐'.repeat(log.rating) : '';
           const text = [
-            `☕ ${log.beanName || log.origin || 'Coffee'}`,
+            `☕ ${log.beanName || log.origin || 'coffee'}`,
             log.origin && log.varietal ? `${log.origin} • ${log.varietal}` : (log.origin || log.varietal || ''),
-            log.method ? `Brewed with: ${BREWERS[log.method]?.name || log.method}` : '',
+            log.method ? `brew method: ${BREWERS[log.method]?.name || log.method}` : '',
             stars,
             log.notes ? `"${log.notes}"` : '',
             '',
-            '— via Brew Buddy'
+            '— via brew buddy'
           ].filter(Boolean).join('\n');
 
           if (navigator.share) {
@@ -987,7 +987,7 @@
           } else {
             // Fallback: copy to clipboard
             await navigator.clipboard.writeText(text);
-            alert('Copied to clipboard!');
+            alert('copied to clipboard!');
           }
         };
 
@@ -1002,7 +1002,7 @@
         return (
           <div className="space-y-4 pb-24">
             <div className="flex items-center justify-between">
-              <h2 className="text-purple-400 pixel-glow" style={{fontSize: '0.9rem'}}>BREW LOG</h2>
+              <h2 className="text-purple-400 pixel-glow" style={{fontSize: '0.9rem'}}>brew log</h2>
               {user && (
                 <button onClick={() => setView('log')} className="w-9 h-9 bg-purple-900 border-2 border-purple-500 flex items-center justify-center hover:bg-purple-800" style={{borderRadius: '0'}}>
                   <Plus className="w-5 h-5 text-green-400" />
@@ -1013,13 +1013,13 @@
             {/* Rating Filter */}
             {user && logs.length > 0 && (
               <div className="flex items-center gap-2">
-                <span className="ds-card-footer">Filter:</span>
+                <span className="ds-card-footer">filter:</span>
                 <div className="flex gap-1">
                   <button 
                     onClick={() => setRatingFilter(0)}
                     className={`px-3 py-1 border-2 text-sm ${ratingFilter === 0 ? 'bg-purple-600 border-purple-400 text-white' : 'bg-gray-900 border-gray-700 text-gray-400'}`}
                     style={{borderRadius: '0'}}>
-                    ALL
+                    all
                   </button>
                   {[3, 4, 5].map(r => (
                     <button 
@@ -1037,28 +1037,28 @@
             {!user ? (
               <div className="text-center py-20 flex flex-col items-center">
                 <Coffee className="w-16 h-16 text-purple-400 mb-6" />
-                <p className="text-purple-300 mb-2 text-xl">TRACK YOUR BREWS</p>
-                <p className="text-gray-500 mb-8 text-lg">Sign in to save your coffee journal</p>
-                <Button onClick={signInWithGoogle}><LogIn className="w-4 h-4" /> SIGN IN WITH GOOGLE</Button>
+                <p className="text-purple-300 mb-2 text-xl">track your brews</p>
+                <p className="text-gray-500 mb-8 text-lg">sign in to save your coffee journal</p>
+                <Button onClick={signInWithGoogle}><LogIn className="w-4 h-4" /> sign in with google</Button>
               </div>
             ) : logsLoading ? (
               <div className="text-center py-20"><Loader className="w-8 h-8 text-gray-500 animate-spin mx-auto" /></div>
             ) : logs.length === 0 ? (
               <div className="text-center py-20 text-gray-500">
                 <div className="text-4xl mb-4">☕</div>
-                <p className="text-lg mb-2">NO ENTRIES YET</p>
-                <p className="text-sm"><button onClick={() => setView('select')} className="text-green-400 border-b-2 border-green-400 hover:text-green-300">START BREWING</button> or add a past entry</p>
+                <p className="text-lg mb-2">no entries yet</p>
+                <p className="text-sm"><button onClick={() => setView('select')} className="text-green-400 border-b-2 border-green-400 hover:text-green-300">start brewing</button> or add a past entry</p>
               </div>
             ) : (
               <div className="space-y-3">
                 {filteredLogs.length === 0 ? (
                   <div className="text-center py-10 text-gray-500">
-                    <p className="text-lg">No brews match this filter</p>
+                    <p className="text-lg">no brews match this filter</p>
                   </div>
                 ) : filteredLogs.map(log => (
                   <Card key={log.id} className="bounce-pixel">
                     {/* Bean name as focal point */}
-                    <h3 className="ds-card-title mb-2">{log.beanName || log.origin || 'Unknown'}</h3>
+                    <h3 className="ds-card-title mb-2">{log.beanName || log.origin || 'unknown'}</h3>
                     
                     {/* Origin & Varietal */}
                     <div className="ds-card-meta mb-3">
@@ -1131,33 +1131,33 @@
           }
           setSaving(false);
           if (!result.error) { await loadLogs(); onClose(); }
-          else alert('Error: ' + result.error.message);
+          else alert('error: ' + result.error.message);
         };
 
         return (
           <div className="space-y-5 pb-24">
             <div className="flex items-center gap-3">
               <button onClick={onClose} className="text-gray-500 hover:text-white"><ChevronLeft className="w-6 h-6" /></button>
-              <h2 className="text-white font-bold text-lg">{log ? 'Edit Entry' : 'Add Entry'}</h2>
+              <h2 className="text-white font-bold text-lg">{log ? 'edit entry' : 'add entry'}</h2>
             </div>
             
             <Card className="space-y-4">
               <div>
-                <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Bean Name / Roaster</label>
+                <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">bean name / roaster</label>
                 <input type="text" value={beanName} onChange={e => setBeanName(e.target.value)} 
-                  placeholder="e.g. Blue Bottle Hayes Valley"
+                  placeholder="e.g. blue bottle hayes valley"
                   className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Origin</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">origin</label>
                   <select value={origin} onChange={e => setOrigin(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                     {COUNTRIES.map(c => <option key={c}>{c}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Varietal</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">varietal</label>
                   <select value={varietal} onChange={e => setVarietal(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                     {VARIETALS.map(v => <option key={v}>{v}</option>)}
                   </select>
@@ -1166,26 +1166,26 @@
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Level</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">roast level</label>
                   <select value={roast} onChange={e => setRoast(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
-                    <option value="light">Light</option><option value="medium">Medium</option><option value="dark">Dark</option>
+                    <option value="light">light</option><option value="medium">medium</option><option value="dark">dark</option>
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Roast Date</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">roast date</label>
                   <input type="date" value={roastDate} onChange={e => setRoastDate(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{colorScheme:'dark', borderRadius: '0'}} />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Brew Method</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">brew method</label>
                   <select value={method} onChange={e => setMethod(e.target.value)} className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}}>
                     {Object.entries(BREWERS).map(([k,v]) => <option key={k} value={k}>{v.name}</option>)}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Coffee (g)</label>
+                  <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">coffee (g)</label>
                   <input type="number" value={coffee} onChange={e => setCoffee(e.target.value === '' ? '' : Number(e.target.value))} 
                     placeholder="e.g. 18"
                     className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg text-center focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
@@ -1193,7 +1193,7 @@
               </div>
 
               <div>
-                <label className="block text-gray-400 text-sm uppercase tracking-wider mb-2">Rating</label>
+                <label className="block text-gray-400 text-sm lowercase tracking-wider mb-2">rating</label>
                 <div className="flex gap-3 justify-center">
                   {[1,2,3,4,5].map(s => (
                     <button key={s} onClick={() => setRating(s)} className={`w-10 h-10 border-2 flex items-center justify-center transition-all ${s <= rating ? 'bg-green-500 border-green-300 text-black' : 'bg-gray-800 border-gray-600 text-gray-600'}`} style={{borderRadius: '0'}}>
@@ -1204,13 +1204,13 @@
               </div>
 
               <div>
-                <label className="block text-gray-500 text-sm uppercase tracking-wider mb-1">Tasting Notes</label>
-                <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="How did it taste?"
+                <label className="block text-gray-500 text-sm lowercase tracking-wider mb-1">tasting notes</label>
+                <textarea value={notes} onChange={e => setNotes(e.target.value)} rows={3} placeholder="how did it taste?"
                   className="w-full bg-gray-900 border-2 border-gray-600 px-3 py-2 text-white text-lg resize-none focus:border-purple-500 focus:outline-none" style={{borderRadius: '0'}} />
               </div>
             </Card>
             
-            <Button onClick={handleSave} disabled={saving} className="w-full py-3">{saving ? 'SAVING...' : 'SAVE'}</Button>
+            <Button onClick={handleSave} disabled={saving} className="w-full py-3">{saving ? 'saving...' : 'save'}</Button>
         </div>
       );
       };
@@ -1223,13 +1223,13 @@
               className={`flex flex-col items-center gap-1 px-4 py-1 border-2 ${['select','recipe','brew','log'].includes(view) ? 'text-green-400 border-green-400 bg-green-400/10' : 'text-gray-500 border-transparent'}`}
               style={{borderRadius: '0'}}>
               <Coffee className="w-5 h-5" />
-              <span style={{fontSize: '0.65rem'}}>BREW</span>
+              <span style={{fontSize: '0.65rem'}}>brew</span>
              </button>
             <button onClick={() => setView('history')}
               className={`flex flex-col items-center gap-1 px-4 py-1 border-2 ${view === 'history' ? 'text-green-400 border-green-400 bg-green-400/10' : 'text-gray-500 border-transparent'}`}
               style={{borderRadius: '0'}}>
               <History className="w-5 h-5" />
-              <span style={{fontSize: '0.65rem'}}>LOG</span>
+              <span style={{fontSize: '0.65rem'}}>log</span>
              </button>
           </nav>
 
